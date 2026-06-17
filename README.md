@@ -6,7 +6,15 @@ you were tilting a physical holographic card.
 
 One GPU engine (Rust + [wgpu](https://wgpu.rs)), one WGSL shader set, thin
 per-platform bindings. **React Native (iOS) and Web (WebGPU/wasm) ship today**;
-iOS/Android native and Flutter bindings are planned from the same core.
+Android and Flutter bindings are planned from the same core.
+
+**▶ [Live demo](https://alexdonh.github.io/hologramism/)** — tilt your device (or
+drag) to see the foil shift. Best in a WebGPU browser (see [Web](#web-webgpu)).
+
+| Package | Platform | Registry |
+| --- | --- | --- |
+| [`@hologramism/browser`](https://www.npmjs.com/package/@hologramism/browser) | Web (WebGPU/wasm) | npm |
+| [`@hologramism/react-native`](https://www.npmjs.com/package/@hologramism/react-native) | React Native (iOS) | npm |
 
 ## How it works
 
@@ -23,51 +31,41 @@ auto-orbit on a simulator) becomes the per-frame view + light vectors.
 
 A scene is described once as a small, serializable JSON document (the same schema
 on every platform) and handed to the engine; bindings do no per-field marshaling.
+`HologramCanvas` props (web) are identical to `HologramView` props (React Native).
 
 The engine presents **directly to a GPU surface** — a WebGPU `<canvas>` on the
-web, a `CAMetalLayer` on iOS — so frames never round-trip through the CPU. A CPU
-read-back path remains for headless/golden-image use and as an automatic fallback
-when surface attach is unavailable.
+web, a `CAMetalLayer` on iOS — so frames never round-trip through the CPU.
 
 ## Features
 
 - **Shapes** — `rect` (rounded), `circle`, `ellipse`, arbitrary **polygons**, or a
   **PNG/SVG** used either as artwork (`image`) or as a silhouette mask filled by a
-  preset (`mask`). Every silhouette — analytic or PNG/SVG alpha — gets an embossed
-  **edge bevel** (a chamfer distance transform recovers it for raster masks), so
-  the rim catches light like real foil even on thin features.
+  preset (`mask`). Every silhouette gets an embossed **edge bevel**, so the rim
+  catches light like real foil even on thin features.
 - **Presets** — `linear`, `radial`, `concentric`, `guilloche`, `dotMatrix`,
   `rosette`, `lattice`, and `rainbow`, each with tunable frequency/angle.
 - **Color** — physical `spectrum`, six built-in foils (gold, silver, rainbowFoil,
   emerald, sapphire, copper), or a custom palette.
 - **Layout** — place the shape as a single sized/positioned copy
-  (`Layout.single`), or **repeat** it across the view as a grid (`Layout.tile`,
-  with `size`/`gap`/`fit`). The pattern and color stay **global** — they sweep the
-  whole layout as one surface, not per tile. Works for shapes, image masks, and
-  artwork.
+  (`Layout.single`), or **repeat** it across the view as a grid (`Layout.tile`).
+  The pattern and color stay **global** — they sweep the whole layout as one
+  surface, not per tile.
 - **Motion glare** — a diffraction-grating light reflection that sweeps across the
   surface as the device tilts; strength is tunable (`glare`; `0` disables).
 - **Kinegram multiplex** — stack multiple layers, each its own shape/preset/color,
-  and the view **temporally cross-fades** between them by tilt direction (smooth,
-  grain-free flip).
-- **Transparent by default** — overlay the hologram on any content; an alpha mask
-  shows what's behind it.
+  and the view **temporally cross-fades** between them by tilt direction.
+- **Transparent by default** — overlay the hologram on any content.
 - **Motion** — real device sensors, or pan-gesture + idle auto-orbit; each toggle
   is configurable.
 
 ## Web (WebGPU)
 
-Requires Chrome ≥ 113, Edge ≥ 113, or Safari 18+ (Technology Preview). Firefox
-needs `dom.webgpu.enabled` in `about:config`. iOS Safari 18+ works with
+Requires Chrome ≥ 113, Edge ≥ 113, or Safari 18+. Firefox needs
+`dom.webgpu.enabled` in `about:config`. iOS Safari 18+ works with
 motion-permission UI handled automatically.
 
 ```sh
-# Build the wasm module once (or after any Rust change):
-./scripts/build_wasm.sh
-
-# Start the demo:
-cd examples/browser && npm install && npm run dev
-# → http://localhost:5173
+npm install @hologramism/browser
 ```
 
 ```tsx
@@ -89,9 +87,7 @@ import { HologramCanvas, Preset, Layout } from '@hologramism/browser';
 />
 ```
 
-The same scene JSON schema is used by all bindings — `HologramCanvas` props
-are identical to `HologramView` props in React Native.
-
+See [`@hologramism/browser`](bindings/browser) for the full API.
 
 ## React Native
 
@@ -123,14 +119,6 @@ import { HologramView, Preset, Layout } from '@hologramism/react-native';
 <HologramView shape={{ type: 'png', uri, mode: 'image' }} />
 <HologramView shape={{ type: 'png', uri, mode: 'mask' }} preset="dotMatrix" />
 
-// Benton "3D rainbow" — a spectral gradient that slides across any shape on tilt.
-<HologramView shape="circle" preset="rainbow" />
-
-// Layout: tile the shape into a grid (one rainbow sweeps the whole grid), or
-// place a single shape off-center. `size`/`gap` are fractions of the view.
-<HologramView shape="circle" preset="rainbow" layout={Layout.tile({ size: 0.22, gap: 0.03 })} />
-<HologramView shape="star" layout={Layout.single({ size: 0.4, position: [0.2, 0.8] })} />
-
 // Kinegram: cross-fades gold↔sapphire as you tilt.
 <HologramView
   layers={[
@@ -141,7 +129,11 @@ import { HologramView, Preset, Layout } from '@hologramism/react-native';
 />
 ```
 
-### Props
+See [`@hologramism/react-native`](bindings/react-native) for the full API.
+
+## Props
+
+Identical for `HologramCanvas` (web) and `HologramView` (React Native).
 
 | Prop | Type | Notes |
 | --- | --- | --- |
@@ -152,54 +144,31 @@ import { HologramView, Preset, Layout } from '@hologramism/react-native';
 | `layers` | `Layer \| Layer[]` | each layer takes `shape`/`preset`/`color`/`azimuth` (deg)/`layout`; array = multiplex |
 | `background` | `string` (hex) or `RGBA` | transparent by default; set a hex string or `[r,g,b,a]` to make it opaque |
 | `tilt` | `{ motion?, gesture?, autoOrbit? }` | orientation sources (all default true) |
-| `glare` | `number` | strength of the motion-driven light reflection that sweeps as the device tilts; `0` disables |
+| `glare` | `number` | strength of the motion-driven light reflection; `0` disables |
 | look | `intensity`, `gratingFrequency`, `iridescence`, `sparkleDensity`, `sparkleIntensity`, `highlightSharpness` | flat, global (applies to the whole scene) |
 
 Angles and azimuths are in **degrees**.
 
-## Layout
+## Examples
 
-```
-crates/
-  core/      hlg-core     render engine: wgpu device, frame loop, channels, uniforms
-  shaders/   hlg-shaders  WGSL shader (grating + iridescence + sparkle + blend)
-  assets/    hlg-assets   shape/polygon/preset/PNG/SVG -> the four GPU maps
-  ffi/       hlg-ffi      C ABI (cbindgen) + JSON scene schema + shared EngineHost
-  wasm/      hlg-wasm     WebGPU/wasm binding (wasm-bindgen)
-bindings/
-  react-native/            @hologramism/react-native npm package (iOS)
-  browser/                 @hologramism/browser npm package (WebGPU)
-scripts/
-  build_ios_xcframework.sh
-  build_wasm.sh            wasm-pack → bindings/browser/pkg/
-examples/
-  react-native/            React Native demo app
-  browser/                 React + Vite demo (mirrors RN demo)
-```
+Runnable demos live in [`examples/`](examples):
 
-## Build
+- [`examples/browser`](examples/browser) — React + Vite WebGPU demo
+- [`examples/react-native`](examples/react-native) — React Native iOS demo
 
 ```sh
-cargo build            # whole workspace (native)
-cargo test             # asset, golden-image, and C-ABI tests
-cargo run -p hlg-core --example preview   # desktop preview (writes PNGs)
-
-# iOS: rebuild the vendored XCFramework after any Rust change
-scripts/build_ios_xcframework.sh
-
-# Web: build wasm module then run the demo
-scripts/build_wasm.sh
 cd examples/browser && npm install && npm run dev
 ```
 
+The browser demo is published live at
+**[alexdonh.github.io/hologramism](https://alexdonh.github.io/hologramism/)**.
+
 ## Status
 
-- ✅ Rust core + WGSL shader, headless render, golden tests
-- ✅ C ABI (`hlg-ffi`) with a single JSON scene API + image-asset upload
-- ✅ React Native iOS binding + demo (verified on device, incl. motion sensors)
-- ✅ Web (WebGPU) binding — `hlg-wasm` + `@hologramism/browser` + React + Vite demo
-- ✅ Direct GPU presentation — WebGPU `<canvas>` surface (web) and `CAMetalLayer`
-  surface (iOS), with CPU read-back as an automatic fallback
+- ✅ Web (WebGPU) — `@hologramism/browser` + React + Vite demo
+- ✅ React Native iOS — `@hologramism/react-native` (verified on device, incl. motion sensors)
+- ✅ Direct GPU presentation — WebGPU `<canvas>` (web) and `CAMetalLayer` (iOS),
+  with CPU read-back as an automatic fallback
 - ⏳ Planned: Android, Flutter
 
 ## License
