@@ -21,10 +21,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
+      - name: Install browser binding deps
+        working-directory: bindings/browser
+        run: npm install
       - name: Install example deps
         working-directory: examples/browser
         # Resolves @hologramism/browser via the in-repo file: path (ships pkg/).
