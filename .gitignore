@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.cache/
+ios/Pods/
+**/build/
+.gradle/
+.DS_Store
+*.log

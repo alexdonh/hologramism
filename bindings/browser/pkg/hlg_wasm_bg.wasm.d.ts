@@ -1,0 +1,38 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export const __wbg_hologramengine_free: (a: number, b: number) => void;
+export const hologramengine_create: (a: number, b: number, c: number) => [number, number, number];
+export const hologramengine_dimensions: (a: number) => any;
+export const hologramengine_render: (a: number) => [number, number];
+export const hologramengine_renderRgba: (a: number) => any;
+export const hologramengine_resizeSurface: (a: number, b: number, c: number) => [number, number];
+export const hologramengine_setAsset: (a: number, b: number, c: number, d: number, e: number) => number;
+export const hologramengine_setOrientation: (a: number, b: number, c: number, d: number, e: number) => void;
+export const hologramengine_setScene: (a: number, b: number, c: number) => [number, number];
+export const hologramengine_setTime: (a: number, b: number) => void;
+export const initGpu: () => any;
+export const hlg_abi_version: () => number;
+export const hlg_attach_surface: (a: number, b: number) => number;
+export const hlg_create: (a: number) => number;
+export const hlg_destroy: (a: number) => void;
+export const hlg_dimensions: (a: number, b: number, c: number) => void;
+export const hlg_last_error: () => number;
+export const hlg_render: (a: number) => number;
+export const hlg_render_rgba: (a: number, b: number, c: number) => number;
+export const hlg_set_asset: (a: number, b: number, c: number, d: number, e: number) => number;
+export const hlg_set_orientation: (a: number, b: number, c: number, d: number, e: number) => void;
+export const hlg_set_scene: (a: number, b: number, c: number) => number;
+export const hlg_set_time: (a: number, b: number) => void;
+export const wasm_bindgen__convert__closures_____invoke__hda436c504d5cba3e: (a: number, b: number, c: any) => [number, number];
+export const wasm_bindgen__convert__closures_____invoke__h1cbebd78309b5fcf: (a: number, b: number, c: any, d: any) => void;
+export const wasm_bindgen__convert__closures_____invoke__h4828e64c9c4622b2: (a: number, b: number, c: any) => void;
+export const wasm_bindgen__convert__closures_____invoke__h4828e64c9c4622b2_2: (a: number, b: number, c: any) => void;
+export const __wbindgen_malloc: (a: number, b: number) => number;
+export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+export const __wbindgen_exn_store: (a: number) => void;
+export const __externref_table_alloc: () => number;
+export const __wbindgen_externrefs: WebAssembly.Table;
+export const __wbindgen_destroy_closure: (a: number, b: number) => void;
+export const __externref_table_dealloc: (a: number) => void;
+export const __wbindgen_start: () => void;

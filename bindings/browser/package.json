@@ -1,0 +1,40 @@
+{
+  "name": "@hologramism/browser",
+  "version": "0.0.0-beta.2",
+  "description": "Motion-reactive security-hologram (DOVID/Kinegram) canvas for the web — GPU-rendered (Rust + wgpu/WebGPU), reacts to device-orientation and pointer tilt. Same scene schema as @hologramism/react-native.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "files": [
+    "src",
+    "pkg",
+    "LICENSE"
+  ],
+  "keywords": [
+    "hologram",
+    "holographic",
+    "dovid",
+    "kinegram",
+    "webgpu",
+    "wasm",
+    "iridescent",
+    "foil"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/alexdonh/hologramism#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexdonh/hologramism.git",
+    "directory": "bindings/browser"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12"
+  }
+}
