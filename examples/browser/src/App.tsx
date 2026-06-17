@@ -82,9 +82,9 @@ function shapeValue(name: ShapeName): HologramShape {
     case 'rect':
       return { type: 'rect', cornerRadius: 0.18 };
     case 'bird':
-      return { type: 'png', uri: '/bird.png', mode: 'image' };
+      return { type: 'png', uri: `${import.meta.env.BASE_URL}bird.png`, mode: 'image' };
     case 'bird·masked':
-      return { type: 'png', uri: '/bird.png', mode: 'mask' };
+      return { type: 'png', uri: `${import.meta.env.BASE_URL}bird.png`, mode: 'mask' };
     default:
       return { type: name };
   }
