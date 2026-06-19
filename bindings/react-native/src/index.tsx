@@ -77,16 +77,8 @@ export type HologramColorMode =
   | 'copper'
   | RGBA[];
 
-/** Flat look parameters, used globally and (optionally) per layer. */
-export interface Look {
-  intensity?: number;
-  gratingFrequency?: number;
-  iridescence?: number;
-  sparkleDensity?: number;
-  sparkleIntensity?: number;
-  highlightSharpness?: number;
-  glare?: number;
-}
+/** Glint controls: `true`/`false` to enable/disable with defaults, or per-field overrides. */
+export type Sparkle = boolean | { density?: number; intensity?: number };
 
 export interface HologramLayer {
   shape?: HologramShape;
@@ -98,7 +90,7 @@ export interface HologramLayer {
   layout?: HologramLayout;
 }
 
-export interface HologramViewProps extends ViewProps, Look {
+export interface HologramViewProps extends ViewProps {
   // Single-layer shorthand (the common case).
   shape?: HologramShape;
   preset?: HologramPreset;
@@ -112,6 +104,13 @@ export interface HologramViewProps extends ViewProps, Look {
   background?: string | RGBA;
   // Orientation / interaction (all default true).
   tilt?: { motion?: boolean; gesture?: boolean; autoOrbit?: boolean };
+  // Look parameters, applied globally to the scene.
+  intensity?: number;
+  grating?: number;
+  iridescence?: number;
+  sparkle?: Sparkle;
+  sharpness?: number;
+  glare?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -172,21 +171,12 @@ function normColor(c?: HologramColorMode): object | undefined {
 }
 
 // Pull only the defined look fields off an object.
-function pickLook(o: Look): Partial<Look> {
+function pickLook(o: HologramViewProps): Record<string, unknown> {
   const out: any = {};
-  (
-    [
-      'intensity',
-      'gratingFrequency',
-      'iridescence',
-      'sparkleDensity',
-      'sparkleIntensity',
-      'highlightSharpness',
-      'glare',
-    ] as const
-  ).forEach(k => {
+  (['intensity', 'grating', 'iridescence', 'sharpness', 'glare'] as const).forEach(k => {
     if (o[k] != null) out[k] = o[k];
   });
+  if (o.sparkle != null) out.sparkle = o.sparkle;
   return out;
 }
 
@@ -265,11 +255,10 @@ export function HologramView(props: HologramViewProps) {
     background,
     tilt,
     intensity,
-    gratingFrequency,
+    grating,
     iridescence,
-    sparkleDensity,
-    sparkleIntensity,
-    highlightSharpness,
+    sparkle,
+    sharpness,
     glare,
     ...rest
   } = props;

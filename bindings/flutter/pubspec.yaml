@@ -1,0 +1,25 @@
+name: hologramism
+description: "Motion-reactive security-hologram (DOVID/Kinegram) widget for Flutter (iOS + Android) — color-shifting foil that tilts with the device, GPU-rendered (Rust + wgpu)."
+version: 1.0.0
+homepage: https://github.com/alexdonh/hologramism
+repository: https://github.com/alexdonh/hologramism
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^3.0.0
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: HologramismPlugin
+      android:
+        package: io.github.alexdonh.hologramism.flutter
+        pluginClass: HologramismPlugin

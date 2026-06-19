@@ -33,11 +33,15 @@ export interface HologramCanvasHandle {
   requestMotion: () => Promise<void>;
 }
 
-const MAX_SIDE = 640;
+// Cap the device-pixel scale (not an absolute side) so the canvas renders crisp
+// at its container size without over-rendering on high-DPI displays. Mirrors the
+// native views, which present the GPU surface at full container resolution and
+// cap the density to 2× (see HologramView on iOS/Android).
+const MAX_SCALE = 2;
 
-function clampSize(cw: number, ch: number): [number, number] {
-  const scale = Math.min(1, MAX_SIDE / Math.max(cw, ch, 1));
-  return [Math.round(cw * scale) || 1, Math.round(ch * scale) || 1];
+function backingSize(cw: number, ch: number): [number, number] {
+  const s = Math.min(window.devicePixelRatio || 1, MAX_SCALE);
+  return [Math.round(cw * s) || 1, Math.round(ch * s) || 1];
 }
 
 // Angle-axis → quaternion (degrees, ZY-rotations for device orientation).
@@ -178,14 +182,14 @@ function HologramCanvasImpl(
     const setupCanvas = () => {
       const cw = canvas.offsetWidth || 300;
       const ch = canvas.offsetHeight || 300;
-      const [rw, rh] = clampSize(cw, ch);
+      const [rw, rh] = backingSize(cw, ch);
       canvas.width = rw;
       canvas.height = rh;
       return [rw, rh] as [number, number];
     };
 
     (async () => {
-      const [rw, rh] = setupCanvas();
+      let [rw, rh] = setupCanvas();
 
       try {
         engine = await createEngine(rw, rh, canvas);
@@ -201,10 +205,14 @@ function HologramCanvasImpl(
       }
       engineRef.current = engine;
 
-      // Observe CSS-size changes and reconfigure the surface.
+      // Observe CSS-size changes and reconfigure the surface — but only when the
+      // backing size actually changes (configure rebuilds the swapchain; not
+      // per-frame work). Matches the native views' resize-on-change guard.
       resizeObserver = new ResizeObserver(() => {
         if (!alive || !canvas) return;
         const [cw, ch] = setupCanvas();
+        if (cw === rw && ch === rh) return;
+        rw = cw; rh = ch;
         engine?.resizeSurface(cw, ch);
       });
       resizeObserver.observe(canvas);
@@ -232,8 +240,9 @@ function HologramCanvasImpl(
           let q = orientRef.current;
 
           if (autoOrbit && !pointerRef.current && motionPermission !== 'granted') {
-            const fx = Math.sin(t * 0.4) * 0.2;
-            const fy = Math.cos(t * 0.3) * 0.2;
+            // Amplitude/frequency match the native views' idle orbit.
+            const fx = Math.sin(t * 0.6) * 0.25;
+            const fy = Math.cos(t * 0.5) * 0.25;
             const fz = 0;
             const fw = Math.sqrt(Math.max(0, 1 - fx * fx - fy * fy - fz * fz));
             const orbit: [number, number, number, number] = [fx, fy, fz, fw];
@@ -283,11 +292,10 @@ function HologramCanvasImpl(
     props.layout,
     props.layers,
     props.intensity,
-    props.gratingFrequency,
+    props.grating,
     props.iridescence,
-    props.sparkleDensity,
-    props.sparkleIntensity,
-    props.highlightSharpness,
+    props.sparkle,
+    props.sharpness,
     props.glare,
     props.background,
   ]);

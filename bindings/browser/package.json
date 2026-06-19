@@ -1,7 +1,7 @@
 {
   "name": "@hologramism/browser",
-  "version": "0.0.0-beta.4",
-  "description": "Motion-reactive security-hologram (DOVID/Kinegram) canvas for the web — GPU-rendered (Rust + wgpu/WebGPU), reacts to device-orientation and pointer tilt. Same scene schema as @hologramism/react-native.",
+  "version": "1.0.0",
+  "description": "Motion-reactive security-hologram (DOVID/Kinegram) canvas for the web — color-shifting foil that tilts with the device, GPU-rendered (Rust + wgpu/WebGPU).",
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",

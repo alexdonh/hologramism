@@ -61,7 +61,11 @@ import { HologramCanvas, Preset, Layout } from '@hologramism/browser';
 | `background` | `string` (hex) or `RGBA` | transparent by default; set a hex string or `[r,g,b,a]` to make it opaque |
 | `tilt` | `{ motion?, gesture?, autoOrbit? }` | orientation sources (all default true) |
 | `glare` | `number` | strength of the motion-driven light reflection; `0` disables |
-| look | `intensity`, `gratingFrequency`, `iridescence`, `sparkleDensity`, `sparkleIntensity`, `highlightSharpness` | flat, global (applies to the whole scene) |
+| `sparkle` | `true \| false \| { density?, intensity? }` | glint control, global; `true`/`false` enable/disable with defaults, an object overrides `density` (count) / `intensity` (brightness) |
+| `intensity` | `number` | blend between flat artwork and full holographic shimmer (`0`–`1`) |
+| `grating` | `number` | diffraction line density; higher = finer color bands |
+| `iridescence` | `number` | thin-film color-shift strength |
+| `sharpness` | `number` | specular / glare hotspot tightness (higher = tighter) |
 
 Angles and azimuths are in **degrees**. Presets: `linear`, `radial`,
 `concentric`, `guilloche`, `dotMatrix`, `rosette`, `lattice`, `rainbow`. Foils:

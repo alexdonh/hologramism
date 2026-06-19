@@ -1,13 +1,12 @@
 # @hologramism/react-native
 
 Motion-reactive **security-hologram** (DOVID / Kinegram) view for React Native —
-color-shifting foil that tilts with the device, GPU-rendered (Rust + wgpu/Metal).
-Shapes, PNG/SVG sources, multi-layer kinegram flip, transparent overlay.
+color-shifting foil that tilts with the device, GPU-rendered (Rust + wgpu).
+Shapes, PNG/SVG sources, multi-layer kinegram flip, transparent overlay. iOS and
+Android.
 
 Same scene schema as [`@hologramism/browser`](https://www.npmjs.com/package/@hologramism/browser):
 `HologramView` props match `HologramCanvas` props one-for-one.
-
-> iOS only (for now).
 
 **▶ [Live web demo](https://alexdonh.github.io/hologramism/)** — same engine and
 scene schema, running in the browser. Tilt or drag to see the foil shift.
@@ -18,14 +17,18 @@ scene schema, running in the browser. Tilt or drag to see the foil shift.
 npm install @hologramism/react-native
 ```
 
-This package (autolinked) is the thin Swift/ObjC bridge. The GPU engine ships
-separately as a prebuilt `Hologramism.xcframework`, hosted on GitHub Releases.
+This package (autolinked) is the thin native bridge; the GPU engine ships
+separately per platform.
+
+### iOS
+
+The engine ships as the prebuilt `HologramismKit` pod, hosted on GitHub Releases.
 Add one line to your `ios/Podfile` pointing at the matching release, so CocoaPods
-resolves the bridge's `Hologramism` dependency:
+resolves the bridge's `HologramismKit` dependency:
 
 ```ruby
-pod 'Hologramism', :podspec =>
-  'https://github.com/alexdonh/hologramism/releases/download/v0.1.0/Hologramism.podspec'
+pod 'HologramismKit', :podspec =>
+  'https://github.com/alexdonh/hologramism/releases/download/v0.1.0/HologramismKit.podspec'
 ```
 
 ```sh
@@ -33,6 +36,13 @@ cd ios && pod install
 ```
 
 Use the release tag that matches your installed package version.
+
+### Android
+
+The engine ships as the `io.github.alexdonh:hologramism` AAR on **Maven Central**.
+Make sure `mavenCentral()` is in your app's repositories — no credentials needed.
+
+`minSdk 24`. The bridge autolinks; no other setup.
 
 ## Usage
 
@@ -76,7 +86,11 @@ import { HologramView, Preset, Layout } from '@hologramism/react-native';
 | `background` | `string` (hex) or `RGBA` | transparent by default; set a hex string or `[r,g,b,a]` to make it opaque |
 | `tilt` | `{ motion?, gesture?, autoOrbit? }` | orientation sources (all default true) |
 | `glare` | `number` | strength of the motion-driven light reflection; `0` disables |
-| look | `intensity`, `gratingFrequency`, `iridescence`, `sparkleDensity`, `sparkleIntensity`, `highlightSharpness` | flat, global (applies to the whole scene) |
+| `sparkle` | `true \| false \| { density?, intensity? }` | glint control, global; `true`/`false` enable/disable with defaults, an object overrides `density` (count) / `intensity` (brightness) |
+| `intensity` | `number` | blend between flat artwork and full holographic shimmer (`0`–`1`) |
+| `grating` | `number` | diffraction line density; higher = finer color bands |
+| `iridescence` | `number` | thin-film color-shift strength |
+| `sharpness` | `number` | specular / glare hotspot tightness (higher = tighter) |
 
 Angles and azimuths are in **degrees**. Presets: `linear`, `radial`,
 `concentric`, `guilloche`, `dotMatrix`, `rosette`, `lattice`, `rainbow`. Foils:

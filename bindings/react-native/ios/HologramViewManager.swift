@@ -1,5 +1,6 @@
 import UIKit
 import React
+import HologramismKit
 
 @objc(HologramViewManager)
 public class HologramViewManager: RCTViewManager {

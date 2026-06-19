@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Remote png/svg `uri` shapes are fetched off the main thread; apps that
+         only use local/base64/inline assets can omit the INTERNET permission. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

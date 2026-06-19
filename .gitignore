@@ -4,5 +4,11 @@ dist/
 ios/Pods/
 **/build/
 .gradle/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.build/
+**/xcuserdata/
+DerivedData/
 .DS_Store
 *.log

@@ -1,0 +1,28 @@
+PODS:
+  - Flutter (1.0.0)
+  - hologramism (0.1.0):
+    - Flutter
+    - HologramismKit (= 0.1.0)
+  - HologramismKit (0.1.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - hologramism (from `.symlinks/plugins/hologramism/ios`)
+  - HologramismKit (from `../../../dist/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  hologramism:
+    :path: ".symlinks/plugins/hologramism/ios"
+  HologramismKit:
+    :path: "../../../dist/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  hologramism: bc16f2372e80a0db412de9f35ca5ea3e1416accb
+  HologramismKit: cc5bbb446096e47521f2bf4f509dbc363653f3b7
+
+PODFILE CHECKSUM: 1704d3a9c44a0b4c36fd646febba3224f3861033
+
+COCOAPODS: 1.16.2

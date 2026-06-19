@@ -1,0 +1,9 @@
+.gradle/
+build/
+**/build/
+local.properties
+.cxx/
+
+# Prebuilt Rust engine + staged header (produced by scripts/build_android.sh).
+hologramism/src/main/jniLibs/
+hologramism/src/main/cpp/include/

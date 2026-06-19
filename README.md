@@ -36,6 +36,11 @@ on every platform) and handed to the engine; bindings do no per-field marshaling
 The engine presents **directly to a GPU surface** — a WebGPU `<canvas>` on the
 web, a `CAMetalLayer` on iOS — so frames never round-trip through the CPU.
 
+The GPU surface renders at the view's native resolution (device-pixel scale
+capped at 2×); the CPU read-back fallback is capped to ~640px on its longest
+side — softer but cheap, since it copies every pixel each frame. Both are
+automatic; no configuration.
+
 ## Features
 
 - **Shapes** — `rect` (rounded), `circle`, `ellipse`, arbitrary **polygons**, or a
@@ -96,13 +101,13 @@ npm install @hologramism/react-native
 ```
 
 The React Native package (autolinked) is the thin Swift/ObjC bridge. The GPU
-engine ships separately as a prebuilt `Hologramism.xcframework`, hosted on GitHub
+engine ships separately as the prebuilt `HologramismKit` pod, hosted on GitHub
 Releases. Add one line to your `ios/Podfile` pointing at the matching release, so
-CocoaPods resolves the bridge's `Hologramism` dependency:
+CocoaPods resolves the bridge's `HologramismKit` dependency:
 
 ```ruby
-pod 'Hologramism', :podspec =>
-  'https://github.com/alexdonh/hologramism/releases/download/v0.1.0/Hologramism.podspec'
+pod 'HologramismKit', :podspec =>
+  'https://github.com/alexdonh/hologramism/releases/download/v0.1.0/HologramismKit.podspec'
 ```
 
 ```sh
@@ -145,7 +150,11 @@ Identical for `HologramCanvas` (web) and `HologramView` (React Native).
 | `background` | `string` (hex) or `RGBA` | transparent by default; set a hex string or `[r,g,b,a]` to make it opaque |
 | `tilt` | `{ motion?, gesture?, autoOrbit? }` | orientation sources (all default true) |
 | `glare` | `number` | strength of the motion-driven light reflection; `0` disables |
-| look | `intensity`, `gratingFrequency`, `iridescence`, `sparkleDensity`, `sparkleIntensity`, `highlightSharpness` | flat, global (applies to the whole scene) |
+| `sparkle` | `true \| false \| { density?, intensity? }` | glint control, global; `true`/`false` enable/disable with defaults, an object overrides `density` (count) / `intensity` (brightness) |
+| `intensity` | `number` | blend between flat artwork and full holographic shimmer (`0`–`1`) |
+| `grating` | `number` | diffraction line density; higher = finer color bands |
+| `iridescence` | `number` | thin-film color-shift strength |
+| `sharpness` | `number` | specular / glare hotspot tightness (higher = tighter) |
 
 Angles and azimuths are in **degrees**.
 

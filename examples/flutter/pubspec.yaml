@@ -1,0 +1,23 @@
+name: hologramism_example
+description: Demo app for the hologramism Flutter plugin (iOS).
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  hologramism:
+    # The plugin lives in this monorepo; consumers use `flutter pub add hologramism`.
+    path: ../../bindings/flutter
+
+dev_dependencies:
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/bird.png

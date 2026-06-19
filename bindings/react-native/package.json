@@ -1,18 +1,21 @@
 {
   "name": "@hologramism/react-native",
-  "version": "0.0.0-beta.4",
-  "description": "Motion-reactive security-hologram (DOVID/Kinegram) view for React Native — color-shifting foil that tilts with the device, GPU-rendered (Rust + wgpu/Metal). Shapes, PNG/SVG sources, multi-layer kinegram flip, transparent overlay.",
+  "version": "1.0.0",
+  "description": "Motion-reactive security-hologram (DOVID/Kinegram) view for React Native (iOS) — color-shifting foil that tilts with the device, GPU-rendered (Rust + wgpu/Metal).",
   "main": "src/index.tsx",
   "types": "src/index.tsx",
   "files": [
     "src",
     "ios/**/*.{h,m,mm,swift}",
-    "hologramism-react-native.podspec",
+    "android/src/**/*.{kt,java}",
+    "android/build.gradle",
+    "hologramism.podspec",
     "LICENSE"
   ],
   "keywords": [
     "react-native",
     "ios",
+    "android",
     "hologram",
     "holographic",
     "dovid",

@@ -78,10 +78,12 @@ export interface InitOutput {
     readonly hlg_attach_surface: (a: number, b: number) => number;
     readonly hlg_create: (a: number) => number;
     readonly hlg_destroy: (a: number) => void;
+    readonly hlg_detach_surface: (a: number) => void;
     readonly hlg_dimensions: (a: number, b: number, c: number) => void;
     readonly hlg_last_error: () => number;
     readonly hlg_render: (a: number) => number;
     readonly hlg_render_rgba: (a: number, b: number, c: number) => number;
+    readonly hlg_resize_surface: (a: number, b: number, c: number) => number;
     readonly hlg_set_asset: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly hlg_set_orientation: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly hlg_set_scene: (a: number, b: number, c: number) => number;

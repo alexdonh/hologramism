@@ -19,3 +19,13 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// The native engine AAR (io.github.alexdonh:hologramism) lives on Maven Central;
+// for local dev it's published to mavenLocal by
+// `cd bindings/android && ./gradlew :hologramism:publishToMavenLocal`.
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}

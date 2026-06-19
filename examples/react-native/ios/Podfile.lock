@@ -2141,8 +2141,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
   hermes-engine: 59429905a519d5ce108c90aa0ef27a1483ddfa9a
-  Hologramism: 6b266d18ec393cbb4378a4f880facbfd71c5d14d
-  hologramism-react-native: c98e46e29f6ab9da4affe9c71e83df2f953bc279
+  Hologramism: c5594f2fc955f3c989091bb0c930f690823a8d72
+  hologramism-react-native: b90d0d50af3e895f20259adefd2273c470b4f740
   RCTDeprecation: 2a74a2c57675e64419bd89078efde81f7c1de90b
   RCTRequired: 30451112e6fef4e6f31b4e7eee0845156e35e4b0
   RCTSwiftUI: 5aaf0b07e747ba749dc6acc94d8bd41eea4b570f

@@ -2,16 +2,17 @@ import UIKit
 import CoreMotion
 import Metal
 import simd
-import Hologramism
+import HologramismFFI
 
 /// Native hologram view. Owns a `HlgEngine`, runs a CADisplayLink render loop,
 /// and drives orientation from CoreMotion (device) or a pan gesture + idle
 /// auto-orbit (simulator). Renders via a `CAMetalLayer` GPU surface, falling
 /// back to CPU readback + blit if surface attach fails.
 ///
-/// Content comes from the JS-side **scene** prop (mirrors the Rust scene
-/// schema); this view resolves image assets, serializes to JSON, and calls
-/// `hlg_set_scene`.
+/// Content comes from the **scene** dictionary (mirrors the Rust scene schema);
+/// this view resolves image assets, serializes to JSON, and calls
+/// `hlg_set_scene`. Bindings (React Native, Flutter) and the SwiftUI wrapper all
+/// build that dictionary from the typed `Scene` model in `Scene.swift`.
 @objc(HologramView)
 public class HologramView: UIView {
 
@@ -23,6 +24,14 @@ public class HologramView: UIView {
   // Render buffer + size (internal resolution, capped for perf).
   private var rw: UInt32 = 0
   private var rh: UInt32 = 0
+  // Full container pixel size — drives the GPU presentation surface (uncapped).
+  private var fullW: UInt32 = 0
+  private var fullH: UInt32 = 0
+  // Last size the GPU surface was configured to; reconfigure only when it
+  // changes (configure rebuilds the swapchain + pipeline — never per frame,
+  // and ensureEngine() runs every tick).
+  private var surfW: UInt32 = 0
+  private var surfH: UInt32 = 0
   private var buffer = [UInt8]()
   private let colorSpace = CGColorSpaceCreateDeviceRGB()
 
@@ -90,19 +99,35 @@ public class HologramView: UIView {
 
   private func ensureEngine() {
     let scale = min(window?.screen.scale ?? 2.0, 2.0)
+    let fw = bounds.width * scale
+    let fh = bounds.height * scale
+    if fw < 1 || fh < 1 { return }
+    // The engine's internal resolution is capped (bounds the per-frame CPU
+    // readback in the fallback path). The GPU surface, which has no readback
+    // cost, is configured separately to the full container size so direct-GPU
+    // presentation renders crisply at native resolution.
+    fullW = UInt32(fw); fullH = UInt32(fh)
     let maxDim: CGFloat = 640
-    var w = bounds.width * scale
-    var h = bounds.height * scale
-    if w < 1 || h < 1 { return }
+    var w = fw, h = fh
     let longest = max(w, h)
     if longest > maxDim {
       let k = maxDim / longest
       w *= k; h *= k
     }
     let nw = UInt32(w), nh = UInt32(h)
-    if nw == rw && nh == rh && engine != nil { return }
+    if nw == rw && nh == rh && engine != nil {
+      // Capped size unchanged; track the container size on the GPU surface, but
+      // only reconfigure when it actually changed (ensureEngine runs per tick).
+      if surfaceAttached, let e = engine, fullW != surfW || fullH != surfH {
+        _ = hlg_resize_surface(e, fullW, fullH)
+        surfW = fullW; surfH = fullH
+      }
+      return
+    }
 
     if let e = engine { hlg_destroy(e); engine = nil }
+    surfaceAttached = false
+    surfW = 0; surfH = 0  // new engine → surface reconfigured below.
     rw = nw; rh = nh
     buffer = [UInt8](repeating: 0, count: Int(rw * rh * 4))
 
@@ -125,7 +150,11 @@ public class HologramView: UIView {
     // readback if it fails.
     if let e = engine, let ml = metalLayer {
       surfaceAttached = hlg_attach_surface(e, Unmanaged.passUnretained(ml).toOpaque())
-      if !surfaceAttached, let c = hlg_last_error() {
+      if surfaceAttached {
+        // Present at full container resolution (engine buffer stays capped).
+        _ = hlg_resize_surface(e, fullW, fullH)
+        surfW = fullW; surfH = fullH
+      } else if let c = hlg_last_error() {
         NSLog("[HologramView] hlg_attach_surface failed (using CPU fallback): \(String(cString: c))")
       }
     }
@@ -329,13 +358,13 @@ public class HologramView: UIView {
     lastPanTime = CACurrentMediaTime()
   }
 
-  // MARK: - Props (set by the view manager)
+  // MARK: - Props (set by the view manager / platform-view factory / SwiftUI wrapper)
 
-  @objc func setScene(_ v: NSDictionary) {
+  @objc public func setScene(_ v: NSDictionary) {
     resolveScene(v)
   }
 
-  @objc func setTilt(_ v: NSDictionary) {
+  @objc public func setTilt(_ v: NSDictionary) {
     motionEnabled = (v["motion"] as? NSNumber)?.boolValue ?? true
     gestureEnabled = (v["gesture"] as? NSNumber)?.boolValue ?? true
     autoOrbit = (v["autoOrbit"] as? NSNumber)?.boolValue ?? true

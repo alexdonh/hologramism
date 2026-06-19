@@ -58,15 +58,8 @@ export type HologramColorMode =
   | 'copper'
   | RGBA[];
 
-export interface Look {
-  intensity?: number;
-  gratingFrequency?: number;
-  iridescence?: number;
-  sparkleDensity?: number;
-  sparkleIntensity?: number;
-  highlightSharpness?: number;
-  glare?: number;
-}
+/** Glint controls: `true`/`false` to enable/disable with defaults, or per-field overrides. */
+export type Sparkle = boolean | { density?: number; intensity?: number };
 
 export interface HologramLayer {
   shape?: HologramShape;
@@ -78,7 +71,7 @@ export interface HologramLayer {
   layout?: HologramLayout;
 }
 
-export interface HologramProps extends Look {
+export interface HologramProps {
   shape?: HologramShape;
   preset?: HologramPreset;
   color?: HologramColorMode;
@@ -87,6 +80,13 @@ export interface HologramProps extends Look {
   // Transparent by default; set `background` (hex string or RGBA) for opaque.
   background?: string | RGBA;
   tilt?: { motion?: boolean; gesture?: boolean; autoOrbit?: boolean };
+  // Look parameters, applied globally to the scene.
+  intensity?: number;
+  grating?: number;
+  iridescence?: number;
+  sparkle?: Sparkle;
+  sharpness?: number;
+  glare?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -143,21 +143,12 @@ function normColor(c?: HologramColorMode): object | undefined {
   return { type: 'spectrum' };
 }
 
-function pickLook(o: Look): Partial<Look> {
-  const out: Record<string, number> = {};
-  (
-    [
-      'intensity',
-      'gratingFrequency',
-      'iridescence',
-      'sparkleDensity',
-      'sparkleIntensity',
-      'highlightSharpness',
-      'glare',
-    ] as const
-  ).forEach((k) => {
-    if (o[k] != null) out[k] = o[k] as number;
+function pickLook(o: HologramProps): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  (['intensity', 'grating', 'iridescence', 'sharpness', 'glare'] as const).forEach((k) => {
+    if (o[k] != null) out[k] = o[k];
   });
+  if (o.sparkle != null) out.sparkle = o.sparkle;
   return out;
 }
 

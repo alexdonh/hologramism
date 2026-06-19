@@ -17,13 +17,13 @@ end
 target 'HologramismDemo' do
   config = use_native_modules!
 
-  # The `@hologramism/react-native` pod depends on the binary `Hologramism` pod.
+  # The `@hologramism/react-native` pod depends on the binary `HologramismKit` pod.
   # Released apps point at the published podspec on GitHub Releases:
-  #   pod 'Hologramism', :podspec =>
-  #     'https://github.com/alexdonh/hologramism/releases/download/vX.Y.Z/Hologramism.podspec'
+  #   pod 'HologramismKit', :podspec =>
+  #     'https://github.com/alexdonh/hologramism/releases/download/vX.Y.Z/HologramismKit.podspec'
   # For LOCAL development against an unreleased engine, build it first
   # and use that build via :path:
-  # pod 'Hologramism', :path => '../../../dist/ios'
+  pod 'HologramismKit', :path => '../../../dist/ios'
 
   use_react_native!(
     :path => config[:reactNativePath],

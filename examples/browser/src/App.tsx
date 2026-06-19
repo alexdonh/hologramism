@@ -300,10 +300,9 @@ export default function App() {
         <HologramCanvas
           style={{ position: 'absolute', inset: 0 }}
           intensity={0.95}
-          gratingFrequency={6}
+          grating={6}
           iridescence={0.65}
-          sparkleDensity={0.35}
-          sparkleIntensity={0.5}
+          sparkle={{ density: 0.35, intensity: 0.5 }}
           glare={glare}
           tilt={{ autoOrbit, gesture: true }}
           {...hologramProps}
