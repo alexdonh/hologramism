@@ -33,7 +33,7 @@ android {
 repositories {
     google()
     // Published native engine AAR (io.github.alexdonh:hologramism on Maven
-    // Central — anonymous, no credentials needed).
+    // Central; anonymous, no credentials needed).
     mavenCentral()
     // Local dev: build the AAR with scripts/build_android.sh then
     // `./gradlew :hologramism:publishToMavenLocal`.
@@ -43,5 +43,5 @@ repositories {
 dependencies {
     implementation "com.facebook.react:react-android"
     // The shared native HologramView (TextureView + engine).
-    implementation "io.github.alexdonh:hologramism:1.0.0"
+    implementation "io.github.alexdonh:hologramism:1.0.1"
 }

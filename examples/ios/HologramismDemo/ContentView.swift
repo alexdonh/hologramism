@@ -1,7 +1,7 @@
 import SwiftUI
 import HologramismKit
 
-// SwiftUI twin of examples/react-native/App.tsx — same control set (mode, shape,
+// SwiftUI twin of examples/react-native/App.tsx; same control set (mode, shape,
 // layout, color/pattern or kinegram layers, glare, overlay, auto-orbit) driving
 // the shared Hologramism engine.
 
@@ -142,7 +142,7 @@ struct ContentView: View {
           .font(.system(size: 30, weight: .heavy))
           .foregroundColor(.white)
           .padding(.top, 8)
-        Text("Drag the card to tilt it — or watch it auto-orbit.")
+        Text("Drag the card to tilt it, or watch it auto-orbit.")
           .font(.system(size: 13))
           .foregroundColor(Color(white: 0.55))
           .padding(.bottom, 8)

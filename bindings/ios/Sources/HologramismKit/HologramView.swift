@@ -24,11 +24,11 @@ public class HologramView: UIView {
   // Render buffer + size (internal resolution, capped for perf).
   private var rw: UInt32 = 0
   private var rh: UInt32 = 0
-  // Full container pixel size — drives the GPU presentation surface (uncapped).
+  // Full container pixel size; drives the GPU presentation surface (uncapped).
   private var fullW: UInt32 = 0
   private var fullH: UInt32 = 0
   // Last size the GPU surface was configured to; reconfigure only when it
-  // changes (configure rebuilds the swapchain + pipeline — never per frame,
+  // changes (configure rebuilds the swapchain + pipeline, never per frame,
   // and ensureEngine() runs every tick).
   private var surfW: UInt32 = 0
   private var surfH: UInt32 = 0
@@ -127,7 +127,7 @@ public class HologramView: UIView {
 
     if let e = engine { hlg_destroy(e); engine = nil }
     surfaceAttached = false
-    surfW = 0; surfH = 0  // new engine → surface reconfigured below.
+    surfW = 0; surfH = 0  // new engine -> surface reconfigured below.
     rw = nw; rh = nh
     buffer = [UInt8](repeating: 0, count: Int(rw * rh * 4))
 

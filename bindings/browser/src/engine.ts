@@ -22,7 +22,7 @@ export async function initHologramism(): Promise<void> {
   if (!wasmInit) {
     wasmInit = (async () => {
       const mod = await import('../pkg/hlg_wasm.js');
-      await mod.default(); // wasm-pack `init` — fetches + compiles the .wasm
+      await mod.default(); // wasm-pack `init`: fetches + compiles the .wasm
       await mod.initGpu(); // async GPU device init (wasm32 path)
       wasm = mod;
     })();
@@ -31,7 +31,7 @@ export async function initHologramism(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Asset kind codes — mirror crates/ffi/src/scene.rs `AssetKind`
+// Asset kind codes: mirror crates/ffi/src/scene.rs `AssetKind`
 // ---------------------------------------------------------------------------
 const ASSET_PNG = 0;
 const ASSET_SVG = 1;
@@ -123,7 +123,7 @@ function base64ToBytes(b64: string): Uint8Array {
 }
 
 // ---------------------------------------------------------------------------
-// EngineWrapper — safe JS handle over the wasm HologramEngine
+// EngineWrapper: safe JS handle over the wasm HologramEngine
 // ---------------------------------------------------------------------------
 export class EngineWrapper {
   private eng: import('../pkg/hlg_wasm.js').HologramEngine;
@@ -140,7 +140,7 @@ export class EngineWrapper {
     const { scene: resolved, assets } = await resolveAssets(
       scene as Record<string, unknown>,
     );
-    // Check again after the async asset resolution — the engine may have been
+    // Check again after the async asset resolution; the engine may have been
     // destroyed while we were fetching.
     if (this.freed) return;
     for (const a of assets) {

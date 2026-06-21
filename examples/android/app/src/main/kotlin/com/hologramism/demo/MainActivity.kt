@@ -1,4 +1,4 @@
-// Native Android demo for Hologramism — the same control set as the
+// Native Android demo for Hologramism; the same control set as the
 // React Native and Flutter examples (mode, shape, layout, color/pattern or
 // kinegram layers, glare, overlay, auto-orbit) driving the shared engine
 // through the `io.github.alexdonh:hologramism` AAR.
@@ -209,7 +209,7 @@ private fun DemoScreen() {
             modifier = Modifier.padding(top = 16.dp),
         )
         Text(
-            "Drag the card to tilt it — or watch it auto-orbit.",
+            "Drag the card to tilt it, or watch it auto-orbit.",
             color = Color(0xFF8A8A9A), fontSize = 13.sp, textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
         )

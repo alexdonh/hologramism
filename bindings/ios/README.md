@@ -11,11 +11,11 @@ the Flutter plugin both depend on it.
 
 ### Swift Package Manager
 
-In Xcode: **File ▸ Add Package Dependencies…** and enter
-`https://github.com/alexdonh/hologramism`, or in a `Package.swift`:
+In Xcode, open **File > Add Package Dependencies** and enter
+`https://github.com/alexdonh/hologramism`. Or, in a `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/alexdonh/hologramism", from: "0.1.0")
+.package(url: "https://github.com/alexdonh/hologramism", from: "1.0.0")
 ```
 
 Then add `HologramismKit` to your target's dependencies. `import HologramismKit`.
@@ -24,7 +24,7 @@ Then add `HologramismKit` to your target's dependencies. `import HologramismKit`
 
 ```ruby
 pod 'HologramismKit', :podspec =>
-  'https://github.com/alexdonh/hologramism/releases/download/v0.1.0/HologramismKit.podspec'
+  'https://github.com/alexdonh/hologramism/releases/download/v1.0.0/HologramismKit.podspec'
 ```
 
 ## Usage (SwiftUI)
@@ -43,7 +43,7 @@ struct CardView: View {
     Hologram(scene: HologramScene(shape: .circle, preset: Preset.rainbow(),
                           layout: Layout.tile(size: 0.22, gap: 0.03)))
 
-    // Kinegram: cross-fades gold ↔ sapphire on tilt.
+    // Kinegram: cross-fades between gold and sapphire on tilt.
     Hologram(scene: HologramScene(layers: [
       HologramLayer(preset: Preset.linear(angle: 0), color: .gold, azimuth: 0),
       HologramLayer(preset: Preset.rosette(), color: .sapphire, azimuth: 90),

@@ -1,20 +1,20 @@
 # @hologramism/browser
 
-Motion-reactive **security-hologram** (DOVID / Kinegram) canvas for the web — the
-shiny, color-shifting "3D laser" foil look, GPU-rendered (Rust + wgpu/WebGPU) and
-reacting live to device-orientation and pointer tilt.
+A motion-reactive **security-hologram** (DOVID / Kinegram) canvas for the web.
+You get the shiny, color-shifting "3D laser" foil look, GPU-rendered with Rust +
+wgpu/WebGPU, reacting live to device orientation and pointer tilt.
 
 Same scene schema as [`@hologramism/react-native`](https://www.npmjs.com/package/@hologramism/react-native):
 `HologramCanvas` props match `HologramView` props one-for-one.
 
-**▶ [Live demo](https://alexdonh.github.io/hologramism/)** — tilt your device (or
+**▶ [Live demo](https://alexdonh.github.io/hologramism/):** tilt your device (or
 drag) to see the foil shift. Needs a WebGPU browser (see [Requirements](#requirements)).
 
 ## Requirements
 
 WebGPU. Chrome ≥ 113, Edge ≥ 113, or Safari 18+. Firefox needs
-`dom.webgpu.enabled` in `about:config`. iOS Safari 18+ works — motion-permission
-UI is handled automatically.
+`dom.webgpu.enabled` in `about:config`. iOS Safari 18+ works too, and the
+motion-permission prompt is handled for you.
 
 ## Install
 
@@ -39,7 +39,7 @@ import { HologramCanvas, Preset, Layout } from '@hologramism/browser';
 // Tile the shape into a grid; the rainbow sweeps the whole grid as one surface.
 <HologramCanvas shape="circle" preset="rainbow" layout={Layout.tile({ size: 0.22, gap: 0.03 })} />
 
-// Kinegram: cross-fades gold↔sapphire on tilt.
+// Kinegram: cross-fades gold to sapphire on tilt.
 <HologramCanvas
   layers={[
     { preset: Preset.linear({ angle: 0 }), color: 'gold', azimuth: 0 },
@@ -53,16 +53,16 @@ import { HologramCanvas, Preset, Layout } from '@hologramism/browser';
 
 | Prop | Type | Notes |
 | --- | --- | --- |
-| `shape` | `'rect' \| 'circle' \| 'ellipse'` or `{ type, … }` | `polygon` (normalized points), `png`/`svg` (`uri` \| `base64` \| `svg`, `mode: 'image' \| 'mask'`) |
-| `preset` | `'linear' \| …` or `{ type, angle?, freq? }` | `Preset.*(…)` helpers return the config object |
-| `color` | `'spectrum' \| 'gold' \| …` or `RGBA[]` | a bare `[r,g,b,a]` list is a custom palette |
-| `layout` | `'single' \| 'tile'` or `{ type, … }` | `Layout.single({ size?, position? })` places one shape; `Layout.tile({ size?, gap?, fit? })` repeats it as a grid. `size`/`gap` are fractions of the view; `fit: 'cover' \| 'fill'`. Pattern + color stay global |
+| `shape` | `'rect' \| 'circle' \| 'ellipse'` or `{ type, ... }` | `polygon` (normalized points), `png`/`svg` (`uri` \| `base64` \| `svg`, `mode: 'image' \| 'mask'`) |
+| `preset` | `'linear' \| ...` or `{ type, angle?, freq? }` | `Preset.*(...)` helpers return the config object |
+| `color` | `'spectrum' \| 'gold' \| ...` or `RGBA[]` | a bare `[r,g,b,a]` list is a custom palette |
+| `layout` | `'single' \| 'tile'` or `{ type, ... }` | `Layout.single({ size?, position? })` places one shape; `Layout.tile({ size?, gap?, fit? })` repeats it as a grid. `size`/`gap` are fractions of the view; `fit: 'cover' \| 'fill'`. Pattern + color stay global |
 | `layers` | `Layer \| Layer[]` | each layer takes `shape`/`preset`/`color`/`azimuth` (deg)/`layout`; array = multiplex |
 | `background` | `string` (hex) or `RGBA` | transparent by default; set a hex string or `[r,g,b,a]` to make it opaque |
 | `tilt` | `{ motion?, gesture?, autoOrbit? }` | orientation sources (all default true) |
 | `glare` | `number` | strength of the motion-driven light reflection; `0` disables |
 | `sparkle` | `true \| false \| { density?, intensity? }` | glint control, global; `true`/`false` enable/disable with defaults, an object overrides `density` (count) / `intensity` (brightness) |
-| `intensity` | `number` | blend between flat artwork and full holographic shimmer (`0`–`1`) |
+| `intensity` | `number` | blend between flat artwork and full holographic shimmer (`0` to `1`) |
 | `grating` | `number` | diffraction line density; higher = finer color bands |
 | `iridescence` | `number` | thin-film color-shift strength |
 | `sharpness` | `number` | specular / glare hotspot tightness (higher = tighter) |
@@ -75,9 +75,9 @@ Angles and azimuths are in **degrees**. Presets: `linear`, `radial`,
 
 The wasm engine presents directly to a WebGPU `<canvas>`; a CPU read-back path is
 the automatic fallback when surface attach is unavailable. The cross-origin
-isolation headers (`COOP`/`COEP`) are required for the WebGPU context — set them
+isolation headers (`COOP`/`COEP`) are required for the WebGPU context, so set them
 on the page serving the canvas.
 
 ## License
 
-MIT — see [repository](https://github.com/alexdonh/hologramism).
+MIT. See the [repository](https://github.com/alexdonh/hologramism).

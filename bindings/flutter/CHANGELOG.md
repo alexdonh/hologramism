@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- chore: correct stale comments and clean them up
+- chore: update README
+
 ## 1.0.0
 
 - Release 1.0.0

@@ -1,4 +1,4 @@
-// The ergonomic, typed face of the canonical scene schema — the Dart twin of the
+// The ergonomic, typed face of the canonical scene schema: the Dart twin of the
 // TypeScript API in bindings/react-native/src/index.tsx and the Swift API in
 // bindings/ios. Everything resolves to the SAME JSON document the engine parses
 // on every platform.

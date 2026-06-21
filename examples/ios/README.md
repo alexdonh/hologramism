@@ -1,4 +1,4 @@
-# Hologramism — native iOS (SwiftUI) demo
+# Hologramism native iOS (SwiftUI) demo
 
 A SwiftUI app mirroring the React Native demo ([examples/react-native](../react-native)):
 the same mode / shape / layout / color / pattern / kinegram / glare / auto-orbit

@@ -7,7 +7,7 @@ import android.view.Surface
  * functions in `crates/ffi/src/lib.rs`; the native methods live in
  * `src/main/cpp/hlg_jni.c`. Engine handles are opaque `long` pointers.
  *
- * Internal — app code uses [HologramView]. Lifecycle:
+ * Internal: app code uses [HologramView]. Lifecycle:
  * `create -> setAsset* -> setScene -> per-frame setOrientation/setTime +
  * renderSurface|renderRgba -> destroy`.
  */

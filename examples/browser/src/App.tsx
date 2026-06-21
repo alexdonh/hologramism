@@ -1,5 +1,5 @@
 /**
- * Hologramism web demo — mirrors examples/react-native/App.tsx.
+ * Hologramism web demo; mirrors examples/react-native/App.tsx.
  */
 
 import { useState } from 'react';
@@ -273,7 +273,7 @@ export default function App() {
         Hologramism
       </h1>
       <p style={{ color: '#8a8a9a', fontSize: 13, marginBottom: 24, textAlign: 'center' }}>
-        Drag the card to tilt it — or watch it auto-orbit.
+        Drag the card to tilt it, or watch it auto-orbit.
       </p>
 
       {/* Hologram card */}

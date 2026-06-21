@@ -13,7 +13,7 @@ val pkgVersion: String = run {
     Regex("\"version\"\\s*:\\s*\"([^\"]+)\"").find(pkg)?.groupValues?.get(1) ?: "0.0.0"
 }
 
-// Maven coordinate group (publishing) — matches the Android/Kotlin namespace
+// Maven coordinate group (publishing); matches the Android/Kotlin namespace
 // below (io.github.alexdonh.hologramism); consumers `import
 // io.github.alexdonh.hologramism.*`.
 group = "io.github.alexdonh"
@@ -60,18 +60,18 @@ dependencies {
 }
 
 // Publish to Maven Central via the Sonatype Central Portal (consumers resolve it
-// anonymously — no credentials). The Vanniktech plugin wires up the release AAR
+// anonymously; no credentials). The Vanniktech plugin wires up the release AAR
 // + sources/javadoc jars, GPG-signs everything, and uploads.
 //
-// Required credentials (CI secrets → env, or ~/.gradle/gradle.properties):
+// Required credentials (CI secrets -> env, or ~/.gradle/gradle.properties):
 //   ORG_GRADLE_PROJECT_mavenCentralUsername       Central Portal token user
 //   ORG_GRADLE_PROJECT_mavenCentralPassword       Central Portal token pass
 //   ORG_GRADLE_PROJECT_signingInMemoryKey         armored GPG private key
 //   ORG_GRADLE_PROJECT_signingInMemoryKeyPassword GPG key passphrase
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-    // Sign only when a key is configured (CI / Central uploads). Local dev —
-    // `publishToMavenLocal` for the RN/Flutter examples — runs unsigned.
+    // Sign only when a key is configured (CI / Central uploads). Local dev:
+    // `publishToMavenLocal` for the RN/Flutter examples, runs unsigned.
     // ORG_GRADLE_PROJECT_signingInMemoryKey is exposed as the `signingInMemoryKey`
     // project property.
     if (project.findProperty("signingInMemoryKey") != null) {
@@ -80,7 +80,7 @@ mavenPublishing {
     coordinates("io.github.alexdonh", "hologramism", pkgVersion)
     pom {
         name.set("Hologramism")
-        description.set("Motion-reactive security-hologram (DOVID/Kinegram) view for Android — GPU-rendered (Rust + wgpu/Vulkan).")
+        description.set("Motion-reactive security-hologram (DOVID/Kinegram) view for Android: GPU-rendered with Rust + wgpu/Vulkan.")
         url.set("https://github.com/alexdonh/hologramism")
         licenses {
             license {

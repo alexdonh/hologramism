@@ -58,11 +58,11 @@ class HologramView @JvmOverloads constructor(
     // Internal render size (capped) and CPU-fallback buffer.
     private var rw = 0
     private var rh = 0
-    // Full container pixel size — drives the GPU presentation surface (uncapped).
+    // Full container pixel size; drives the GPU presentation surface (uncapped).
     private var fullW = 0
     private var fullH = 0
     // Last size the GPU surface was configured to; reconfigure only when it
-    // changes (configure rebuilds the swapchain + pipeline — not per-frame work).
+    // changes (configure rebuilds the swapchain + pipeline, not per-frame work).
     private var surfW = 0
     private var surfH = 0
     private var rgba: ByteArray = ByteArray(0)
@@ -149,7 +149,7 @@ class HologramView @JvmOverloads constructor(
         // The engine's internal resolution is capped (bounds the per-frame CPU
         // readback in the fallback path). The GPU presentation surface, which has
         // no readback cost, is configured separately to the full container size
-        // below — so direct-GPU devices render crisply at native resolution.
+        // below, so direct-GPU devices render crisply at native resolution.
         // Cap the density to 2× to match the iOS/browser views (avoids
         // over-rendering on 3×-density screens).
         val density = resources.displayMetrics.density

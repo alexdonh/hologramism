@@ -1,10 +1,10 @@
-# Hologramism — native Android demo
+# Hologramism native Android demo
 
 A small Jetpack Compose app showing several `HologramView` configs (guilloché,
 tiled rainbow, kinegram, concentric).
 
-It builds the native binding from source via Gradle composite build
-(`includeBuild ../../bindings/android`) — no publish step needed for local dev.
+It builds the native binding from source via a Gradle composite build
+(`includeBuild ../../bindings/android`), so no publish step is needed for local dev.
 
 ## Run
 

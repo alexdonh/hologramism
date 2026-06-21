@@ -2,7 +2,7 @@ import React from 'react';
 import { requireNativeComponent, ViewProps } from 'react-native';
 
 // ---------------------------------------------------------------------------
-// Public types — the ergonomic face of the canonical scene schema. Strings are
+// Public types: the ergonomic face of the canonical scene schema. Strings are
 // shorthands; objects unlock per-variant fields. Everything resolves to the
 // same JSON the native side (and every other platform) parses.
 // ---------------------------------------------------------------------------
@@ -114,7 +114,7 @@ export interface HologramViewProps extends ViewProps {
 }
 
 // ---------------------------------------------------------------------------
-// Builders — return plain, serializable config objects (NOT JSX), so they work
+// Builders: return plain, serializable config objects (NOT JSX), so they work
 // identically across platforms while giving per-preset typed args.
 // ---------------------------------------------------------------------------
 
@@ -129,7 +129,7 @@ export const Preset = {
   rainbow: (o?: { freq?: number }) => ({ type: 'rainbow' as const, ...o }),
 };
 
-// Layout builders — parallel to `Preset`. Return plain serializable objects.
+// Layout builders: parallel to `Preset`. Return plain serializable objects.
 export const Layout = {
   single: (o?: { size?: number | Vec2; position?: Vec2 }) => ({ type: 'single' as const, ...o }),
   tile: (o?: { size?: number | Vec2; gap?: number | Vec2; fit?: 'cover' | 'fill' }) => ({

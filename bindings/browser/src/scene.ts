@@ -1,5 +1,5 @@
 /**
- * Scene types and helpers — web port of bindings/react-native/src/index.tsx.
+ * Scene types and helpers: web port of bindings/react-native/src/index.tsx.
  * Produces the same canonical JSON the Rust scene parser consumes.
  */
 
@@ -103,7 +103,7 @@ export const Preset = {
   rainbow: (o?: { freq?: number }) => ({ type: 'rainbow' as const, ...o }),
 };
 
-// Layout builders — parallel to `Preset`.
+// Layout builders: parallel to `Preset`.
 export const Layout = {
   single: (o?: { size?: number | Vec2; position?: Vec2 }) => ({ type: 'single' as const, ...o }),
   tile: (o?: { size?: number | Vec2; gap?: number | Vec2; fit?: 'cover' | 'fill' }) => ({
@@ -113,7 +113,7 @@ export const Layout = {
 };
 
 // ---------------------------------------------------------------------------
-// Internal normalizers (props → canonical JSON)
+// Internal normalizers (props -> canonical JSON)
 // ---------------------------------------------------------------------------
 const PALETTE_IDS = ['gold', 'silver', 'rainbowFoil', 'emerald', 'sapphire', 'copper'];
 

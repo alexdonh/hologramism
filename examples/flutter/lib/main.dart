@@ -1,4 +1,4 @@
-// Flutter twin of examples/react-native/App.tsx — the same control set (mode,
+// Flutter twin of examples/react-native/App.tsx; the same control set (mode,
 // shape, layout, color/pattern or kinegram layers, glare, overlay, auto-orbit)
 // driving the shared Hologramism engine through the `hologramism` plugin.
 
@@ -187,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
               const Padding(
                 padding: EdgeInsets.only(top: 4, bottom: 16),
-                child: Text('Drag the card to tilt it — or watch it auto-orbit.',
+                child: Text('Drag the card to tilt it, or watch it auto-orbit.',
                     style: TextStyle(color: Color(0xFF8A8A9A), fontSize: 13)),
               ),
               _card(),

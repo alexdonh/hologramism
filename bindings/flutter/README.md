@@ -1,10 +1,10 @@
 # hologramism (Flutter / iOS + Android)
 
 Flutter binding for the [Hologramism](https://github.com/alexdonh/hologramism)
-animated security-hologram renderer. Renders a native GPU surface — a
+animated security-hologram renderer. It renders to a native GPU surface: a
 `CAMetalLayer` on iOS (the `HologramismKit` Swift package) and an
 `ANativeWindow` / `TextureView` on Android (the `io.github.alexdonh:hologramism`
-AAR). Rust + wgpu under both.
+AAR). Rust + wgpu power both.
 
 ## Install
 
@@ -20,16 +20,16 @@ hosted on GitHub Releases (not on CocoaPods trunk). Add one line to your app's
 
 ```ruby
 pod 'HologramismKit', :podspec =>
-  'https://github.com/alexdonh/hologramism/releases/download/v0.1.0/HologramismKit.podspec'
+  'https://github.com/alexdonh/hologramism/releases/download/v1.0.0/HologramismKit.podspec'
 ```
 
 ### Android
 
 The native engine ships as the `io.github.alexdonh:hologramism` AAR on **Maven
 Central** (the plugin pins the matching version). Just ensure `mavenCentral()` is
-in your app's repositories — no credentials needed.
+in your app's repositories, with no credentials needed.
 
-`minSdk 24`. No other setup — the platform view is registered by the plugin.
+`minSdk 24`. There's no other setup, since the plugin registers the platform view.
 
 ## Usage
 
@@ -49,7 +49,7 @@ HologramView(
   layout: Layout.tile(size: 0.22, gap: 0.03),
 );
 
-// Kinegram: cross-fades gold ↔ sapphire on tilt.
+// Kinegram: cross-fades gold to sapphire on tilt.
 HologramView(
   layers: [
     HologramLayer(preset: Preset.linear(angle: 0), color: HologramColor.gold, azimuth: 0),
@@ -60,5 +60,5 @@ HologramView(
 ```
 
 Angles and azimuths are in **degrees**. The widget props mirror the same
-canonical scene schema used by every Hologramism binding — see the
+canonical scene schema used by every Hologramism binding. See the
 [top-level README](../../README.md) for the full feature list.

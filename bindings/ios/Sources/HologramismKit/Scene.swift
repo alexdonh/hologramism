@@ -1,6 +1,6 @@
 import Foundation
 
-// The ergonomic, typed face of the canonical scene schema — the Swift twin of
+// The ergonomic, typed face of the canonical scene schema: the Swift twin of
 // the TypeScript API in bindings/react-native/src/index.tsx. Everything resolves
 // to the SAME JSON document the engine parses on every platform, so a scene
 // described here is identical to one built from React/JS props.

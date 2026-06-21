@@ -250,7 +250,7 @@ function App() {
         <ScrollView contentContainerStyle={styles.scroll}>
           <Text style={styles.title}>Hologramism</Text>
           <Text style={styles.subtitle}>
-            Drag the card to tilt it — or watch it auto-orbit.
+            Drag the card to tilt it, or watch it auto-orbit.
           </Text>
 
           <View style={styles.card}>

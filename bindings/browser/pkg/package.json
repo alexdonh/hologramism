@@ -2,7 +2,7 @@
   "name": "hlg-wasm",
   "type": "module",
   "description": "wasm-bindgen WebGPU binding for the Hologramism engine.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",

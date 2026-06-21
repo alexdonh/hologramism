@@ -1,4 +1,4 @@
-# Hologramism — Flutter (iOS) demo
+# Hologramism Flutter (iOS) demo
 
 A Flutter app with mode / shape / layout / color / pattern / kinegram / glare /
 auto-orbit controls, driving the shared engine through the `hologramism` plugin.
@@ -21,7 +21,7 @@ flutter create --platforms=ios --project-name hologramism_example .
 #
 #      pod 'HologramismKit', :path => '../../../dist/ios'
 #
-#    (Published apps instead use the release podspec — see bindings/flutter/README.md.)
+#    (Published apps instead use the release podspec; see bindings/flutter/README.md.)
 flutter pub get
 flutter run            # select an iOS simulator
 ```

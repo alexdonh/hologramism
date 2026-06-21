@@ -46,7 +46,7 @@ public struct Hologram: UIViewRepresentable {
     apply(to: view, context: context)
   }
 
-  // Re-send only when the resolved scene / tilt actually changed — SwiftUI calls
+  // Re-send only when the resolved scene / tilt actually changed; SwiftUI calls
   // updateUIView frequently, and resolving a scene can trigger image fetches.
   private func apply(to view: HologramView, context: Context) {
     let sceneDict = scene.dictionary as NSDictionary

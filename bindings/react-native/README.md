@@ -1,14 +1,14 @@
 # @hologramism/react-native
 
-Motion-reactive **security-hologram** (DOVID / Kinegram) view for React Native —
-color-shifting foil that tilts with the device, GPU-rendered (Rust + wgpu).
-Shapes, PNG/SVG sources, multi-layer kinegram flip, transparent overlay. iOS and
-Android.
+A motion-reactive **security-hologram** (DOVID / Kinegram) view for React Native:
+color-shifting foil that tilts with the device, GPU-rendered with Rust + wgpu.
+Supports shapes, PNG/SVG sources, multi-layer kinegram flip, and transparent
+overlay, on both iOS and Android.
 
 Same scene schema as [`@hologramism/browser`](https://www.npmjs.com/package/@hologramism/browser):
 `HologramView` props match `HologramCanvas` props one-for-one.
 
-**▶ [Live web demo](https://alexdonh.github.io/hologramism/)** — same engine and
+**▶ [Live web demo](https://alexdonh.github.io/hologramism/):** the same engine and
 scene schema, running in the browser. Tilt or drag to see the foil shift.
 
 ## Install
@@ -28,7 +28,7 @@ resolves the bridge's `HologramismKit` dependency:
 
 ```ruby
 pod 'HologramismKit', :podspec =>
-  'https://github.com/alexdonh/hologramism/releases/download/v0.1.0/HologramismKit.podspec'
+  'https://github.com/alexdonh/hologramism/releases/download/v1.0.0/HologramismKit.podspec'
 ```
 
 ```sh
@@ -40,9 +40,9 @@ Use the release tag that matches your installed package version.
 ### Android
 
 The engine ships as the `io.github.alexdonh:hologramism` AAR on **Maven Central**.
-Make sure `mavenCentral()` is in your app's repositories — no credentials needed.
+Make sure `mavenCentral()` is in your app's repositories; no credentials needed.
 
-`minSdk 24`. The bridge autolinks; no other setup.
+`minSdk 24`. The bridge autolinks, so there's no other setup.
 
 ## Usage
 
@@ -56,7 +56,7 @@ import { HologramView, Preset, Layout } from '@hologramism/react-native';
 <HologramView shape={{ type: 'png', uri, mode: 'image' }} />
 <HologramView shape={{ type: 'png', uri, mode: 'mask' }} preset="dotMatrix" />
 
-// Benton "3D rainbow" — a spectral gradient that slides across any shape on tilt.
+// Benton "3D rainbow": a spectral gradient that slides across any shape on tilt.
 <HologramView shape="circle" preset="rainbow" />
 
 // Layout: tile the shape into a grid (one rainbow sweeps the whole grid), or
@@ -64,7 +64,7 @@ import { HologramView, Preset, Layout } from '@hologramism/react-native';
 <HologramView shape="circle" preset="rainbow" layout={Layout.tile({ size: 0.22, gap: 0.03 })} />
 <HologramView shape="star" layout={Layout.single({ size: 0.4, position: [0.2, 0.8] })} />
 
-// Kinegram: cross-fades gold↔sapphire as you tilt.
+// Kinegram: cross-fades gold to sapphire as you tilt.
 <HologramView
   layers={[
     { preset: Preset.linear({ angle: 0 }), color: 'gold', azimuth: 0 },
@@ -78,16 +78,16 @@ import { HologramView, Preset, Layout } from '@hologramism/react-native';
 
 | Prop | Type | Notes |
 | --- | --- | --- |
-| `shape` | `'rect' \| 'circle' \| 'ellipse'` or `{ type, … }` | `polygon` (normalized points), `png`/`svg` (`uri` \| `base64` \| `svg`, `mode: 'image' \| 'mask'`) |
-| `preset` | `'linear' \| …` or `{ type, angle?, freq? }` | `Preset.*(…)` helpers return the config object |
-| `color` | `'spectrum' \| 'gold' \| …` or `RGBA[]` | a bare `[r,g,b,a]` list is a custom palette |
-| `layout` | `'single' \| 'tile'` or `{ type, … }` | `Layout.single({ size?, position? })` places one shape; `Layout.tile({ size?, gap?, fit? })` repeats it as a grid. `size`/`gap` are fractions of the view; `fit: 'cover' \| 'fill'`. Pattern + color stay global |
+| `shape` | `'rect' \| 'circle' \| 'ellipse'` or `{ type, ... }` | `polygon` (normalized points), `png`/`svg` (`uri` \| `base64` \| `svg`, `mode: 'image' \| 'mask'`) |
+| `preset` | `'linear' \| ...` or `{ type, angle?, freq? }` | `Preset.*(...)` helpers return the config object |
+| `color` | `'spectrum' \| 'gold' \| ...` or `RGBA[]` | a bare `[r,g,b,a]` list is a custom palette |
+| `layout` | `'single' \| 'tile'` or `{ type, ... }` | `Layout.single({ size?, position? })` places one shape; `Layout.tile({ size?, gap?, fit? })` repeats it as a grid. `size`/`gap` are fractions of the view; `fit: 'cover' \| 'fill'`. Pattern + color stay global |
 | `layers` | `Layer \| Layer[]` | each layer takes `shape`/`preset`/`color`/`azimuth` (deg)/`layout`; array = multiplex |
 | `background` | `string` (hex) or `RGBA` | transparent by default; set a hex string or `[r,g,b,a]` to make it opaque |
 | `tilt` | `{ motion?, gesture?, autoOrbit? }` | orientation sources (all default true) |
 | `glare` | `number` | strength of the motion-driven light reflection; `0` disables |
 | `sparkle` | `true \| false \| { density?, intensity? }` | glint control, global; `true`/`false` enable/disable with defaults, an object overrides `density` (count) / `intensity` (brightness) |
-| `intensity` | `number` | blend between flat artwork and full holographic shimmer (`0`–`1`) |
+| `intensity` | `number` | blend between flat artwork and full holographic shimmer (`0` to `1`) |
 | `grating` | `number` | diffraction line density; higher = finer color bands |
 | `iridescence` | `number` | thin-film color-shift strength |
 | `sharpness` | `number` | specular / glare hotspot tightness (higher = tighter) |
@@ -98,4 +98,4 @@ Angles and azimuths are in **degrees**. Presets: `linear`, `radial`,
 
 ## License
 
-MIT — see [repository](https://github.com/alexdonh/hologramism).
+MIT. See the [repository](https://github.com/alexdonh/hologramism).

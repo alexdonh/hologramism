@@ -1,4 +1,4 @@
-# Hologramism — Web (WebGPU) demo
+# Hologramism Web (WebGPU) demo
 
 A React + Vite app mirroring the [React Native demo](../react-native): the same
 mode / shape / layout / color / pattern / kinegram / glare / auto-orbit controls,
@@ -18,7 +18,7 @@ scripts/build_wasm.sh
 cd examples/browser
 npm install
 npm run dev
-# → http://localhost:5173
+# -> http://localhost:5173
 ```
 
 On desktop the hologram tilts via pointer drag + idle auto-orbit (toggle

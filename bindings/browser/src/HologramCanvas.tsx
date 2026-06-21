@@ -1,13 +1,13 @@
 /**
- * HologramCanvas — React component that renders the hologram onto a
+ * HologramCanvas: React component that renders the hologram onto a
  * `<canvas>` element.
  *
  * Mirrors the RN `HologramView.swift` loop:
- *   mount → initGpu → create engine → setScene → rAF loop
+ *   mount -> initGpu -> create engine -> setScene -> rAF loop
  *
  * Tilt sources (same toggles as `tilt` prop in react-native):
- *   motion:    DeviceOrientationEvent → quaternion (requests iOS permission)
- *   gesture:   pointer drag → pan/tilt
+ *   motion:    DeviceOrientationEvent -> quaternion (requests iOS permission)
+ *   gesture:   pointer drag -> pan/tilt
  *   autoOrbit: idle sin/cos orbit (default when nothing else active)
  */
 
@@ -44,7 +44,7 @@ function backingSize(cw: number, ch: number): [number, number] {
   return [Math.round(cw * s) || 1, Math.round(ch * s) || 1];
 }
 
-// Angle-axis → quaternion (degrees, ZY-rotations for device orientation).
+// Angle-axis -> quaternion (degrees, ZY-rotations for device orientation).
 function eulerToQuat(alpha: number, beta: number, gamma: number): [number, number, number, number] {
   const a = (alpha * Math.PI) / 360;
   const b = (beta * Math.PI) / 360;
@@ -205,7 +205,7 @@ function HologramCanvasImpl(
       }
       engineRef.current = engine;
 
-      // Observe CSS-size changes and reconfigure the surface — but only when the
+      // Observe CSS-size changes and reconfigure the surface, but only when the
       // backing size actually changes (configure rebuilds the swapchain; not
       // per-frame work). Matches the native views' resize-on-change guard.
       resizeObserver = new ResizeObserver(() => {
@@ -225,8 +225,8 @@ function HologramCanvasImpl(
       const tick = async () => {
         if (!alive || !engine) return;
         try {
-          // Apply a queued scene update before rendering.  Doing it here — not
-          // in a separate effect — prevents the wasm-bindgen "recursive use"
+          // Apply a queued scene update before rendering.  Doing it here, not
+          // in a separate effect, prevents the wasm-bindgen "recursive use"
           // borrow error that occurs when setScene/setAsset is called while an
           // async render is still in flight.
           const pending = pendingSceneRef.current;
@@ -255,7 +255,7 @@ function HologramCanvasImpl(
         } catch (err) {
           // If the component unmounted while this tick was in flight, the engine
           // will have been freed and wasm throws null-pointer / recursive-use
-          // errors.  Silently drop them — the loop stops because alive is false.
+          // errors.  Silently drop them; the loop stops because alive is false.
           if (!alive) return;
           console.error('[HologramCanvas] render error:', err);
           return;
@@ -363,7 +363,7 @@ function HologramCanvasImpl(
             whiteSpace: 'nowrap',
           }}
         >
-          Motion denied — using auto-orbit
+          Motion denied, using auto-orbit
         </div>
       )}
     </div>
