@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { launchImageLibrary } from 'react-native-image-picker';
 import {
   HologramView,
   HologramColorMode,
@@ -87,9 +88,34 @@ const BIRD_URI = Image.resolveAssetSource(require('./assets/bird.png')).uri;
 
 // Shape options. `image` shows the bird's pixels as artwork; `masked` uses only
 // the bird's alpha as a silhouette filled by the preset.
-type ShapeName = 'rect' | 'circle' | 'ellipse' | 'star' | 'image' | 'masked';
+type ShapeName =
+  | 'rect'
+  | 'circle'
+  | 'ellipse'
+  | 'star'
+  | 'image'
+  | 'masked'
+  | 'custom'
+  | 'customMasked';
 const SHAPES: ShapeName[] = ['rect', 'circle', 'ellipse', 'star', 'image', 'masked'];
-function shapeValue(name: ShapeName): HologramShape {
+const CUSTOM_SHAPES: ShapeName[] = ['custom', 'customMasked'];
+
+function shapeLabel(name: ShapeName): string {
+  switch (name) {
+    case 'image':
+      return 'bird';
+    case 'masked':
+      return 'bird·masked';
+    case 'custom':
+      return 'yours';
+    case 'customMasked':
+      return 'yours·masked';
+    default:
+      return name;
+  }
+}
+
+function shapeValue(name: ShapeName, picked: string | null): HologramShape {
   switch (name) {
     case 'star':
       return { type: 'polygon', points: STAR };
@@ -99,6 +125,12 @@ function shapeValue(name: ShapeName): HologramShape {
       return { type: 'png', uri: BIRD_URI, mode: 'image' };
     case 'masked':
       return { type: 'png', uri: BIRD_URI, mode: 'mask' };
+    case 'custom':
+    case 'customMasked':
+      // Falls back to a plain rect if the image was cleared mid-render.
+      return picked
+        ? { type: 'png', base64: picked, mode: name === 'custom' ? 'image' : 'mask' }
+        : { type: 'rect', cornerRadius: 0.18 };
     default:
       return { type: name };
   }
@@ -212,7 +244,33 @@ function App() {
   const [autoOrbit, setAutoOrbit] = useState(true);
   const [glare, setGlare] = useState(1.0);
 
-  const shape = shapeValue(shapeName);
+  // User-supplied artwork, kept as base64. Base64 rather than the picker's uri
+  // on purpose: on Android the picker returns a content:// uri, which the
+  // binding's URL-based fetch cannot open.
+  const [picked, setPicked] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    // maxWidth/maxHeight cap the decode cost: in `single` layout the engine
+    // builds four full-resolution maps from the source image.
+    const res = await launchImageLibrary({
+      mediaType: 'photo',
+      includeBase64: true,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    });
+    const b64 = res.assets?.[0]?.base64;
+    if (b64) {
+      setPicked(b64);
+      setShapeName('custom');
+    }
+  };
+
+  const clearPicked = () => {
+    setPicked(null);
+    setShapeName(prev => (CUSTOM_SHAPES.includes(prev) ? 'rect' : prev));
+  };
+
+  const shape = shapeValue(shapeName, picked);
   const layout = LAYOUTS[layoutIdx].value;
 
   // Compose the hologram content from the current mode.
@@ -267,7 +325,7 @@ function App() {
               iridescence={0.65}
               sparkle={{ density: 0.35, intensity: 0.5 }}
               glare={glare}
-              tilt={{ autoOrbit }}
+              tilt={{ motion: !autoOrbit, autoOrbit }}
               {...content}
             />
           </View>
@@ -289,12 +347,33 @@ function App() {
             {SHAPES.map(s => (
               <Chip
                 key={s}
-                label={s === 'image' ? 'bird' : s === 'masked' ? 'bird·masked' : s}
+                label={shapeLabel(s)}
                 active={shapeName === s}
                 onPress={() => setShapeName(s)}
               />
             ))}
+            {picked &&
+              CUSTOM_SHAPES.map(s => (
+                <Chip
+                  key={s}
+                  label={shapeLabel(s)}
+                  active={shapeName === s}
+                  onPress={() => setShapeName(s)}
+                />
+              ))}
+            {picked ? (
+              <TouchableOpacity style={styles.clearPill} onPress={clearPicked}>
+                <Text style={styles.clearPillText}>✕</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.pickPill} onPress={pickImage}>
+                <Text style={styles.pickPillText}>⬆ pick an image</Text>
+              </TouchableOpacity>
+            )}
           </Section>
+          <Text style={styles.hint}>
+            PNG with transparency works best for ·masked.
+          </Text>
 
           <Section title="Layout (placement / repeat)">
             {LAYOUTS.map((l, i) => (
@@ -405,15 +484,44 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  // The transparent border reserves the 1px the outlined pills below draw, so
+  // chips and pills keep the same height on a shared row.
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'transparent',
     backgroundColor: '#1c1c26',
   },
   chipActive: { backgroundColor: '#4a4aff' },
   chipText: { color: '#9a9aaa', fontSize: 13 },
   chipTextActive: { color: '#fff', fontWeight: '700' },
+  // Bring-your-own-image pill + its hint line.
+  pickPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#33334d',
+    borderStyle: 'dashed',
+  },
+  pickPillText: { color: '#8a8aff', fontSize: 13, fontWeight: '600' },
+  clearPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2a2a38',
+  },
+  clearPillText: { color: '#7a7a8a', fontSize: 13 },
+  hint: {
+    width: '100%',
+    color: '#6a6a7a',
+    fontSize: 11,
+    marginTop: -8,
+    marginBottom: 14,
+  },
   // Multiplex layer cards.
   layerCard: {
     width: '100%',

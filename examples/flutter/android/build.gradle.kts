@@ -1,6 +1,10 @@
 allprojects {
     repositories {
         google()
+        // Local dev: build the AAR with scripts/build_android.sh then
+        // `./gradlew :hologramism:publishToMavenLocal` (checked first so a local
+        // build wins).
+        mavenLocal()
         mavenCentral()
     }
 }

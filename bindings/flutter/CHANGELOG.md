@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2
+
+- feat: add support for custom image in the examples
+- chore: reorder maven repo to honor local
+- feat: custom required_limits function for GPU adapter
+- feat: maintain custom image aspect ratio
+
 ## 1.0.1
 
 - chore: correct stale comments and clean them up

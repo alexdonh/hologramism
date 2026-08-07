@@ -13,6 +13,7 @@ dependencies:
   hologramism:
     # The plugin lives in this monorepo; consumers use `flutter pub add hologramism`.
     path: ../../bindings/flutter
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_lints: ^3.0.0

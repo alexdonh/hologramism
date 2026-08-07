@@ -8,6 +8,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:hologramism/hologramism.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() => runApp(const DemoApp());
 
@@ -63,12 +64,24 @@ final _layouts = <(String, HologramLayout?)>[
   ('corner', Layout.single(size: 0.4, position: [0.22, 0.78])),
 ];
 
-enum ShapeName { rect, circle, ellipse, star, image, masked }
+enum ShapeName { rect, circle, ellipse, star, image, masked, custom, customMasked }
+
+const _builtInShapes = [
+  ShapeName.rect,
+  ShapeName.circle,
+  ShapeName.ellipse,
+  ShapeName.star,
+  ShapeName.image,
+  ShapeName.masked,
+];
+const _customShapes = [ShapeName.custom, ShapeName.customMasked];
 
 extension on ShapeName {
   String get label => switch (this) {
         ShapeName.image => 'bird',
         ShapeName.masked => 'bird·masked',
+        ShapeName.custom => 'yours',
+        ShapeName.customMasked => 'yours·masked',
         _ => name,
       };
 }
@@ -108,6 +121,7 @@ class _HomePageState extends State<HomePage> {
   bool autoOrbit = true;
   double glare = 1.0;
   String? birdBase64;
+  String? pickedBase64;
 
   List<(String, HologramColor)> get colors => [..._colors, ('custom', _customColor)];
 
@@ -133,7 +147,40 @@ class _HomePageState extends State<HomePage> {
         return HologramShape.png(base64: birdBase64, mode: ImageMode.image);
       case ShapeName.masked:
         return HologramShape.png(base64: birdBase64, mode: ImageMode.mask);
+      // Fall back to a plain rect if the image was cleared mid-render.
+      case ShapeName.custom:
+        return pickedBase64 == null
+            ? HologramShape.rect(cornerRadius: 0.18)
+            : HologramShape.png(base64: pickedBase64, mode: ImageMode.image);
+      case ShapeName.customMasked:
+        return pickedBase64 == null
+            ? HologramShape.rect(cornerRadius: 0.18)
+            : HologramShape.png(base64: pickedBase64, mode: ImageMode.mask);
     }
+  }
+
+  Future<void> _pickImage() async {
+    // maxWidth/maxHeight cap the decode cost: in `single` layout the engine
+    // builds four full-resolution maps from the source image.
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
+    if (file == null) return;
+    final bytes = await file.readAsBytes();
+    if (!mounted) return;
+    setState(() {
+      pickedBase64 = base64Encode(bytes);
+      shapeName = ShapeName.custom;
+    });
+  }
+
+  void _clearPicked() {
+    setState(() {
+      pickedBase64 = null;
+      if (_customShapes.contains(shapeName)) shapeName = ShapeName.rect;
+    });
   }
 
   HologramView _buildHologram() {
@@ -156,7 +203,7 @@ class _HomePageState extends State<HomePage> {
         iridescence: 0.65,
         sparkle: const Sparkle(density: 0.35, intensity: 0.5),
         glare: glare,
-        tilt: Tilt(autoOrbit: autoOrbit),
+        tilt: Tilt(motion: !autoOrbit, autoOrbit: autoOrbit),
       );
     }
     return HologramView(
@@ -169,7 +216,7 @@ class _HomePageState extends State<HomePage> {
       iridescence: 0.65,
       sparkle: const Sparkle(density: 0.35, intensity: 0.5),
       glare: glare,
-      tilt: Tilt(autoOrbit: autoOrbit),
+      tilt: Tilt(motion: !autoOrbit, autoOrbit: autoOrbit),
     );
   }
 
@@ -196,9 +243,25 @@ class _HomePageState extends State<HomePage> {
                 _chip('multiplex (kinegram)', multiplex, () => setState(() => multiplex = true)),
               ]),
               _section('Shape', [
-                for (final s in ShapeName.values)
+                for (final s in _builtInShapes)
                   _chip(s.label, shapeName == s, () => setState(() => shapeName = s)),
+                if (pickedBase64 != null) ...[
+                  for (final s in _customShapes)
+                    _chip(s.label, shapeName == s, () => setState(() => shapeName = s)),
+                  _outlinePill('✕', const Color(0xFF7A7A8A), const Color(0xFF2A2A38),
+                      _clearPicked),
+                ] else
+                  _outlinePill('⬆ pick an image', const Color(0xFF8A8AFF),
+                      const Color(0xFF33334D), _pickImage),
               ]),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 14),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Text('PNG with transparency works best for ·masked.',
+                      style: TextStyle(color: Color(0xFF6A6A7A), fontSize: 11)),
+                ),
+              ),
               _section('Layout (placement / repeat)', [
                 for (var i = 0; i < _layouts.length; i++)
                   _chip(_layouts[i].$1, layoutIdx == i, () => setState(() => layoutIdx = i)),
@@ -341,13 +404,32 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _chip(String label, bool active, VoidCallback onTap) {
+  // Outlined pill used by the bring-your-own-image control.
+  Widget _outlinePill(String label, Color textColor, Color borderColor, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
+          border: Border.all(color: borderColor),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(label,
+            style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontSize: 13)),
+      ),
+    );
+  }
+
+  Widget _chip(String label, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        // The transparent border reserves the 1px `_outlinePill` draws, so chips
+        // and pills keep the same height on a shared row.
+        decoration: BoxDecoration(
           color: active ? const Color(0xFF4A4AFF) : const Color(0xFF1C1C26),
+          border: Border.all(color: Colors.transparent),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(label,

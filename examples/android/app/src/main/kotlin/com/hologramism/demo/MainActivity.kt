@@ -5,14 +5,21 @@
 
 package com.hologramism.demo
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +43,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,7 +70,9 @@ import io.github.alexdonh.hologramism.Shape
 import io.github.alexdonh.hologramism.Sparkle
 import io.github.alexdonh.hologramism.Tilt
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.net.URL
 import kotlin.math.cos
 import kotlin.math.sin
@@ -116,7 +126,56 @@ private val STAR: List<List<Double>> = (0 until 10).map { i ->
 private enum class ShapeName(val label: String) {
     RECT("rect"), CIRCLE("circle"), ELLIPSE("ellipse"), STAR("star"),
     IMAGE("bird"), MASKED("bird·masked"),
+    CUSTOM("yours"), CUSTOM_MASKED("yours·masked"),
 }
+
+private val BUILT_IN_SHAPES = listOf(
+    ShapeName.RECT, ShapeName.CIRCLE, ShapeName.ELLIPSE, ShapeName.STAR,
+    ShapeName.IMAGE, ShapeName.MASKED,
+)
+private val CUSTOM_SHAPES = listOf(ShapeName.CUSTOM, ShapeName.CUSTOM_MASKED)
+
+// Longest edge a picked image is downscaled to. In `single` layout the engine
+// builds four full-resolution maps from the source, so an untouched 12 MP photo
+// would cost hundreds of MB of texture plus a per-pixel Sobel pass.
+private const val MAX_EDGE = 1024
+
+/**
+ * Read a gallery image, downscale it to [MAX_EDGE] on its longest side, and return
+ * it as PNG base64 — the same form the bundled bird uses. PNG rather than JPEG so
+ * any alpha survives for `·masked` mode. Blocking; call off the main thread.
+ */
+private fun decodeScaledBase64(context: Context, uri: Uri): String? = runCatching {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+
+    // inSampleSize only halves, so decode to within 2x of the target then scale exactly.
+    var sample = 1
+    while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= MAX_EDGE) sample *= 2
+
+    val opts = BitmapFactory.Options().apply { inSampleSize = sample }
+    val decoded = context.contentResolver.openInputStream(uri)?.use {
+        BitmapFactory.decodeStream(it, null, opts)
+    } ?: return@runCatching null
+
+    val longest = maxOf(decoded.width, decoded.height)
+    val bitmap = if (longest > MAX_EDGE) {
+        val ratio = MAX_EDGE.toFloat() / longest
+        Bitmap.createScaledBitmap(
+            decoded,
+            (decoded.width * ratio).toInt().coerceAtLeast(1),
+            (decoded.height * ratio).toInt().coerceAtLeast(1),
+            true,
+        )
+    } else {
+        decoded
+    }
+
+    ByteArrayOutputStream().use { out ->
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
+    }
+}.getOrNull()
 
 private class Layer(var presetIdx: Int, var colorIdx: Int)
 
@@ -149,6 +208,20 @@ private fun DemoScreen() {
     var autoOrbit by remember { mutableStateOf(true) }
     var glare by remember { mutableStateOf(1.0) }
 
+    var pickedBase64 by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val b64 = withContext(Dispatchers.IO) { decodeScaledBase64(context, uri) }
+                if (b64 != null) {
+                    pickedBase64 = b64
+                    shapeName = ShapeName.CUSTOM
+                }
+            }
+        }
+    }
+
     fun shapeValue(): HologramShape = when (shapeName) {
         ShapeName.RECT -> Shape.rect(cornerRadius = 0.18)
         ShapeName.CIRCLE -> Shape.circle()
@@ -156,6 +229,13 @@ private fun DemoScreen() {
         ShapeName.STAR -> Shape.polygon(STAR)
         ShapeName.IMAGE -> Shape.png(base64 = birdBase64, mode = ImageMode.IMAGE)
         ShapeName.MASKED -> Shape.png(base64 = birdBase64, mode = ImageMode.MASK)
+        // Fall back to a plain rect if the image was cleared mid-render.
+        ShapeName.CUSTOM ->
+            pickedBase64?.let { Shape.png(base64 = it, mode = ImageMode.IMAGE) }
+                ?: Shape.rect(cornerRadius = 0.18)
+        ShapeName.CUSTOM_MASKED ->
+            pickedBase64?.let { Shape.png(base64 = it, mode = ImageMode.MASK) }
+                ?: Shape.rect(cornerRadius = 0.18)
     }
 
     // Compose the scene from the current mode.
@@ -220,8 +300,26 @@ private fun DemoScreen() {
             Chip("multiplex (kinegram)", multiplex) { multiplex = true }
         }
         Section("Shape") {
-            ShapeName.values().forEach { s -> Chip(s.label, shapeName == s) { shapeName = s } }
+            BUILT_IN_SHAPES.forEach { s -> Chip(s.label, shapeName == s) { shapeName = s } }
+            if (pickedBase64 != null) {
+                CUSTOM_SHAPES.forEach { s -> Chip(s.label, shapeName == s) { shapeName = s } }
+                OutlinePill("✕", Color(0xFF7A7A8A), Color(0xFF2A2A38)) {
+                    pickedBase64 = null
+                    if (shapeName in CUSTOM_SHAPES) shapeName = ShapeName.RECT
+                }
+            } else {
+                OutlinePill("⬆ pick an image", Color(0xFF8A8AFF), Color(0xFF33334D)) {
+                    pickImage.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                    )
+                }
+            }
         }
+        Text(
+            "PNG with transparency works best for ·masked.",
+            color = Color(0xFF6A6A7A), fontSize = 11.sp,
+            modifier = Modifier.fillMaxWidth().padding(top = 0.dp, bottom = 14.dp),
+        )
         Section("Layout (placement / repeat)") {
             LAYOUTS.forEachIndexed { i, l -> Chip(l.first, layoutIdx == i) { layoutIdx = i } }
         }
@@ -373,6 +471,22 @@ private fun LayerCard(index: Int, layer: Layer, onChange: (Layer) -> Unit, onRem
                 Chip(col.first, layer.colorIdx == c) { onChange(Layer(layer.presetIdx, c)) }
             }
         }
+    }
+}
+
+// Dashed-look outline pill used by the bring-your-own-image control. Compose has
+// no dashed border primitive, so this is a plain hairline outline.
+@Composable
+private fun OutlinePill(label: String, textColor: Color, borderColor: Color, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(end = 8.dp, bottom = 8.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(20.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+    ) {
+        Text(label, color = textColor, fontSize = 13.sp, fontWeight = FontWeight.W600)
     }
 }
 

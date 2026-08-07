@@ -88,10 +88,10 @@ export interface InitOutput {
     readonly hlg_set_orientation: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly hlg_set_scene: (a: number, b: number, c: number) => number;
     readonly hlg_set_time: (a: number, b: number) => void;
-    readonly wasm_bindgen__convert__closures_____invoke__hda436c504d5cba3e: (a: number, b: number, c: any) => [number, number];
-    readonly wasm_bindgen__convert__closures_____invoke__h1cbebd78309b5fcf: (a: number, b: number, c: any, d: any) => void;
-    readonly wasm_bindgen__convert__closures_____invoke__h4828e64c9c4622b2: (a: number, b: number, c: any) => void;
-    readonly wasm_bindgen__convert__closures_____invoke__h4828e64c9c4622b2_2: (a: number, b: number, c: any) => void;
+    readonly wasm_bindgen_36c7099ffcb88b69___convert__closures_____invoke___wasm_bindgen_36c7099ffcb88b69___JsValue__core_9b3796e30d99ddb7___result__Result_____wasm_bindgen_36c7099ffcb88b69___JsError___true_: (a: number, b: number, c: any) => [number, number];
+    readonly wasm_bindgen_36c7099ffcb88b69___convert__closures_____invoke___js_sys_348a457697235051___Function_fn_wasm_bindgen_36c7099ffcb88b69___JsValue_____wasm_bindgen_36c7099ffcb88b69___sys__Undefined___js_sys_348a457697235051___Function_fn_wasm_bindgen_36c7099ffcb88b69___JsValue_____wasm_bindgen_36c7099ffcb88b69___sys__Undefined_______true_: (a: number, b: number, c: any, d: any) => void;
+    readonly wasm_bindgen_36c7099ffcb88b69___convert__closures_____invoke___wasm_bindgen_36c7099ffcb88b69___JsValue______true_: (a: number, b: number, c: any) => void;
+    readonly wasm_bindgen_36c7099ffcb88b69___convert__closures_____invoke___wasm_bindgen_36c7099ffcb88b69___JsValue______true__2: (a: number, b: number, c: any) => void;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_exn_store: (a: number) => void;

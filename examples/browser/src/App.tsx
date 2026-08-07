@@ -2,7 +2,7 @@
  * Hologramism web demo; mirrors examples/react-native/App.tsx.
  */
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   HologramCanvas,
   HologramColorMode,
@@ -11,6 +11,7 @@ import {
   HologramShape,
   Layout,
 } from '@hologramism/browser';
+import { ACCEPTED, PickedImage, fileToPicked, firstImage, pickedShape } from './pickImage';
 
 // ---------------------------------------------------------------------------
 // Configuration data
@@ -72,10 +73,20 @@ const STAR: [number, number][] = (() => {
   return pts;
 })();
 
-type ShapeName = 'rect' | 'circle' | 'ellipse' | 'star' | 'bird' | 'bird·masked';
+// `yours` / `yours·masked` are only offered once the user has supplied an image.
+type ShapeName =
+  | 'rect'
+  | 'circle'
+  | 'ellipse'
+  | 'star'
+  | 'bird'
+  | 'bird·masked'
+  | 'yours'
+  | 'yours·masked';
 const SHAPES: ShapeName[] = ['rect', 'circle', 'ellipse', 'star', 'bird', 'bird·masked'];
+const CUSTOM_SHAPES: ShapeName[] = ['yours', 'yours·masked'];
 
-function shapeValue(name: ShapeName): HologramShape {
+function shapeValue(name: ShapeName, picked: PickedImage | null): HologramShape {
   switch (name) {
     case 'star':
       return { type: 'polygon', points: STAR };
@@ -85,6 +96,12 @@ function shapeValue(name: ShapeName): HologramShape {
       return { type: 'png', uri: `${import.meta.env.BASE_URL}bird.png`, mode: 'image' };
     case 'bird·masked':
       return { type: 'png', uri: `${import.meta.env.BASE_URL}bird.png`, mode: 'mask' };
+    case 'yours':
+    case 'yours·masked':
+      // Falls back to a plain rect if the image was cleared mid-render.
+      return picked
+        ? pickedShape(picked, name === 'yours' ? 'image' : 'mask')
+        : { type: 'rect', cornerRadius: 0.18 };
     default:
       return { type: name };
   }
@@ -93,21 +110,26 @@ function shapeValue(name: ShapeName): HologramShape {
 // ---------------------------------------------------------------------------
 // Helper components
 // ---------------------------------------------------------------------------
+const chipBase: React.CSSProperties = {
+  padding: '7px 14px',
+  borderRadius: 20,
+  border: '1px solid transparent',
+  cursor: 'pointer',
+  fontSize: 13,
+  lineHeight: '18px',
+  fontFamily: 'inherit',
+  transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+};
 
 function Chip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
       style={{
-        padding: '7px 14px',
-        borderRadius: 20,
-        border: 'none',
-        cursor: 'pointer',
-        fontSize: 13,
+        ...chipBase,
         background: active ? '#4a4aff' : '#1c1c26',
         color: active ? '#fff' : '#9a9aaa',
         fontWeight: active ? 700 : 400,
-        transition: 'background 0.15s, color 0.15s',
       }}
     >
       {label}
@@ -131,6 +153,72 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>{children}</div>
     </div>
+  );
+}
+
+/**
+ * Dashed pill that takes an image by click or by drop. Sits inside the Shape
+ * section next to the built-in shape chips.
+ */
+function PickPill({
+  picked,
+  dragging,
+  onFile,
+  onClear,
+}: {
+  picked: PickedImage | null;
+  dragging: boolean;
+  onFile: (f: File) => void;
+  onClear: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  if (picked) {
+    return (
+      <button
+        onClick={onClear}
+        title={`Remove ${picked.name}`}
+        aria-label={`Remove ${picked.name}`}
+        style={{
+          ...chipBase,
+          borderColor: '#2a2a38',
+          background: 'transparent',
+          color: '#7a7a8a',
+          fontWeight: 400,
+        }}
+      >
+        ✕
+      </button>
+    );
+  }
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPTED}
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const f = firstImage(e.target.files);
+          if (f) onFile(f);
+          e.target.value = ''; // allow re-picking the same file
+        }}
+      />
+      <button
+        onClick={() => inputRef.current?.click()}
+        style={{
+          ...chipBase,
+          borderColor: dragging ? '#8a8aff' : '#33334d',
+          borderStyle: 'dashed',
+          background: dragging ? '#1e1e3c' : 'transparent',
+          color: dragging ? '#a8a8ff' : '#8a8aff',
+          fontWeight: 600,
+        }}
+      >
+        ⬆ drop or pick an image
+      </button>
+    </>
   );
 }
 
@@ -230,8 +318,53 @@ export default function App() {
   const [autoOrbit, setAutoOrbit] = useState(true);
   const [glare, setGlare] = useState(1.0);
   const [layoutIdx, setLayoutIdx] = useState(0);
+  const [picked, setPicked] = useState<PickedImage | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [pickError, setPickError] = useState<string | null>(null);
 
-  const shape = shapeValue(shapeName);
+  const acceptFile = useCallback(async (file: File) => {
+    setPickError(null);
+    try {
+      setPicked(await fileToPicked(file));
+      setShapeName('yours');
+    } catch (e) {
+      setPickError(`could not read ${file.name}: ${e instanceof Error ? e.message : e}`);
+    }
+  }, []);
+
+  const clearPicked = useCallback(() => {
+    setPicked(null);
+    setPickError(null);
+    setShapeName((prev) => (CUSTOM_SHAPES.includes(prev) ? 'rect' : prev));
+  }, []);
+
+  // Revoke the object URL once it is no longer the current one — this cleanup
+  // runs both when `picked` is replaced/cleared and when the page tears down.
+  useEffect(() => {
+    const url = picked?.objectUrl;
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [picked]);
+
+  const dropHandlers = {
+    onDragOver: (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(true);
+    },
+    // Ignore leaves that just move onto a child element, which would flicker.
+    onDragLeave: (e: React.DragEvent) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragging(false);
+    },
+    onDrop: (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(false);
+      const f = firstImage(e.dataTransfer.files);
+      if (f) void acceptFile(f);
+    },
+  };
+
+  const shape = shapeValue(shapeName, picked);
   const layout = LAYOUTS[layoutIdx].value;
 
   let hologramProps: object;
@@ -276,8 +409,9 @@ export default function App() {
         Drag the card to tilt it, or watch it auto-orbit.
       </p>
 
-      {/* Hologram card */}
+      {/* Hologram card — also a drop target for bring-your-own-image */}
       <div
+        {...dropHandlers}
         style={{
           position: 'relative',
           width: 300,
@@ -287,6 +421,8 @@ export default function App() {
           overflow: 'hidden',
           background: '#0a0a0f',
           flexShrink: 0,
+          outline: dragging ? '2px dashed #8a8aff' : 'none',
+          outlineOffset: 4,
         }}
       >
         {overlay && (
@@ -315,11 +451,33 @@ export default function App() {
           <Chip label="multiplex (kinegram)" active={multiplex} onClick={() => setMultiplex(true)} />
         </Section>
 
-        <Section title="Shape">
-          {SHAPES.map((s) => (
-            <Chip key={s} label={s} active={shapeName === s} onClick={() => setShapeName(s)} />
-          ))}
-        </Section>
+        <div {...dropHandlers}>
+          <Section title="Shape">
+            {SHAPES.map((s) => (
+              <Chip key={s} label={s} active={shapeName === s} onClick={() => setShapeName(s)} />
+            ))}
+            {picked &&
+              CUSTOM_SHAPES.map((s) => (
+                <Chip key={s} label={s} active={shapeName === s} onClick={() => setShapeName(s)} />
+              ))}
+            <PickPill
+              picked={picked}
+              dragging={dragging}
+              onFile={(f) => void acceptFile(f)}
+              onClear={clearPicked}
+            />
+          </Section>
+          <div
+            style={{
+              color: pickError ? '#ff6a8a' : '#6a6a7a',
+              fontSize: 11,
+              marginTop: -8,
+              marginBottom: 14,
+            }}
+          >
+            {pickError ?? 'PNG or SVG with transparency works best for ·masked.'}
+          </div>
+        </div>
 
         <Section title="Layout (placement / repeat)">
           {LAYOUTS.map((l, i) => (

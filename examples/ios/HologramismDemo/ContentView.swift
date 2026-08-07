@@ -44,12 +44,17 @@ private let LAYOUTS: [(label: String, value: HologramLayout?)] = [
 ]
 
 private enum ShapeName: String, CaseIterable {
-  case rect, circle, ellipse, star, image, masked
+  case rect, circle, ellipse, star, image, masked, custom, customMasked
+
+  static let builtIn: [ShapeName] = [.rect, .circle, .ellipse, .star, .image, .masked]
+  static let customCases: [ShapeName] = [.custom, .customMasked]
 
   var label: String {
     switch self {
     case .image: return "bird"
     case .masked: return "bird·masked"
+    case .custom: return "yours"
+    case .customMasked: return "yours·masked"
     default: return rawValue
     }
   }
@@ -73,7 +78,7 @@ private let birdBase64: String? = {
   return data.base64EncodedString()
 }()
 
-private func shapeValue(_ name: ShapeName) -> HologramShape {
+private func shapeValue(_ name: ShapeName, picked: String?) -> HologramShape {
   switch name {
   case .rect: return .rect(cornerRadius: 0.18)
   case .circle: return .circle
@@ -81,6 +86,11 @@ private func shapeValue(_ name: ShapeName) -> HologramShape {
   case .star: return .polygon(points: STAR)
   case .image: return .png(base64: birdBase64, mode: .image)
   case .masked: return .png(base64: birdBase64, mode: .mask)
+  // Fall back to a plain rect if the image was cleared mid-render.
+  case .custom:
+    return picked.map { .png(base64: $0, mode: .image) } ?? .rect(cornerRadius: 0.18)
+  case .customMasked:
+    return picked.map { .png(base64: $0, mode: .mask) } ?? .rect(cornerRadius: 0.18)
   }
 }
 
@@ -109,9 +119,11 @@ struct ContentView: View {
   @State private var overlay = false
   @State private var autoOrbit = true
   @State private var glare = 1.0
+  @State private var pickedBase64: String?
+  @State private var showPicker = false
 
   private var scene: HologramScene {
-    let shape = shapeValue(shapeName)
+    let shape = shapeValue(shapeName, picked: pickedBase64)
     let layout = LAYOUTS[layoutIdx].value
     if multiplex {
       let n = layers.count
@@ -155,10 +167,39 @@ struct ContentView: View {
         }
 
         Section("Shape") {
-          ForEach(ShapeName.allCases, id: \.self) { s in
+          ForEach(ShapeName.builtIn, id: \.self) { s in
             Chip(s.label, active: shapeName == s) { shapeName = s }
           }
+          if pickedBase64 != nil {
+            ForEach(ShapeName.customCases, id: \.self) { s in
+              Chip(s.label, active: shapeName == s) { shapeName = s }
+            }
+            Button(action: clearPicked) {
+              Text("✕")
+                .font(.system(size: 13))
+                .foregroundColor(Color(white: 0.48))
+                .padding(.horizontal, 14).padding(.vertical, 8)
+                .overlay(Capsule().stroke(Color(red: 0.16, green: 0.16, blue: 0.22), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+          } else {
+            Button { showPicker = true } label: {
+              Text("⬆ pick an image")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color(red: 0.54, green: 0.54, blue: 1))
+                .padding(.horizontal, 14).padding(.vertical, 8)
+                .overlay(
+                  Capsule().strokeBorder(
+                    Color(red: 0.2, green: 0.2, blue: 0.3),
+                    style: StrokeStyle(lineWidth: 1, dash: [4, 3])))
+            }
+            .buttonStyle(.plain)
+          }
         }
+        Text("PNG with transparency works best for ·masked.")
+          .font(.system(size: 11))
+          .foregroundColor(Color(white: 0.42))
+          .frame(maxWidth: .infinity, alignment: .leading)
 
         Section("Layout (placement / repeat)") {
           ForEach(Array(LAYOUTS.enumerated()), id: \.offset) { i, l in
@@ -206,6 +247,18 @@ struct ContentView: View {
       .padding(20)
     }
     .background(Color(red: 0.04, green: 0.04, blue: 0.06).ignoresSafeArea())
+    .sheet(isPresented: $showPicker) {
+      PhotoPicker(isPresented: $showPicker) { base64 in
+        pickedBase64 = base64
+        shapeName = .custom
+      }
+      .ignoresSafeArea()
+    }
+  }
+
+  private func clearPicked() {
+    pickedBase64 = nil
+    if ShapeName.customCases.contains(shapeName) { shapeName = .rect }
   }
 
   private var card: some View {
@@ -215,7 +268,7 @@ struct ContentView: View {
           img.resizable().scaledToFill()
         } placeholder: { Color.black }
       }
-      Hologram(scene: scene, tilt: Tilt(autoOrbit: autoOrbit))
+      Hologram(scene: scene, tilt: Tilt(motion: !autoOrbit, autoOrbit: autoOrbit))
     }
     .frame(width: 300, height: 190)
     .background(Color(red: 0.04, green: 0.04, blue: 0.06))
