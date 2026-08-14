@@ -19,6 +19,8 @@ add_library(hologramism SHARED hlg_jni.c)
 
 target_include_directories(hologramism PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+target_link_options(hologramism PRIVATE "-Wl,-z,max-page-size=16384")
+
 find_library(log-lib log)
 
 target_link_libraries(hologramism

@@ -1,6 +1,6 @@
 {
   "name": "@hologramism/browser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Motion-reactive security-hologram (DOVID/Kinegram) canvas for the web: color-shifting foil that tilts with the device, GPU-rendered with Rust + wgpu/WebGPU.",
   "type": "module",
   "main": "src/index.ts",

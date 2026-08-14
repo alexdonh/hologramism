@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+- build: support 16Kb page sizes
+- chore: remove unused c++_shared
+
 ## 1.0.2
 
 - feat: add support for custom image in the examples

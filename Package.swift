@@ -19,8 +19,8 @@ let package = Package(
         // BINARY-TARGET-START
         .binaryTarget(
             name: "HologramismFFI",
-            url: "https://github.com/alexdonh/hologramism/releases/download/v1.0.2/HologramismFFI.zip",
-            checksum: "2f7fe9f1d9571cd533d10739bab1f2d855b3342bb96fd4dda61e7054f292602d"
+            url: "https://github.com/alexdonh/hologramism/releases/download/v1.0.3/HologramismFFI.zip",
+            checksum: "041274706a5e7ef42920c6f6c597b5084b2243782c049747359d81f028d4f5cf"
         ),
         // BINARY-TARGET-END
         .target(
