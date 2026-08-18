@@ -44,6 +44,26 @@ Make sure `mavenCentral()` is in your app's repositories; no credentials needed.
 
 `minSdk 24`. The bridge autolinks, so there's no other setup.
 
+### Architecture
+
+Both the **new architecture** (Fabric) and the **legacy** one (Paper) are
+supported; the bridge picks the right half at build time from your app's
+existing flag, so there is nothing to configure here.
+
+- **Android** — `newArchEnabled` in `android/gradle.properties` selects the
+  `src/newarch` (codegen-generated interface) or `src/oldarch` (`@ReactProp`)
+  view manager. Both are shells over the same implementation.
+- **iOS** — `RCT_NEW_ARCH_ENABLED` at `pod install` time selects the Fabric
+  component view or the Paper view manager.
+
+Note that React Native itself dropped the legacy architecture in **0.82**: both
+flags are forced on from that version, so the Paper half only ever gets built by
+apps still on 0.81 or older.
+
+The JS API is identical on both. Under the hood the `scene` and `tilt` props
+cross as JSON strings: the scene schema is a recursive union that codegen cannot
+type, and the engine parses JSON on every platform anyway.
+
 ## Usage
 
 ```tsx

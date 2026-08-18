@@ -1,5 +1,6 @@
 import React from 'react';
-import { requireNativeComponent, ViewProps } from 'react-native';
+import { ViewProps } from 'react-native';
+import NativeHologramView from './HologramViewNativeComponent';
 
 // ---------------------------------------------------------------------------
 // Public types: the ergonomic face of the canonical scene schema. Strings are
@@ -234,13 +235,6 @@ function buildScene(props: HologramViewProps): object {
 
 // ---------------------------------------------------------------------------
 
-interface NativeProps extends ViewProps {
-  scene: object;
-  tilt?: object;
-}
-
-const NativeHologramView = requireNativeComponent<NativeProps>('HologramView');
-
 /**
  * Animated security-hologram view. Transparent / overlay-able by default and
  * reacts to device motion (or pan / idle auto-orbit on the simulator).
@@ -253,7 +247,7 @@ export function HologramView(props: HologramViewProps) {
     layout,
     layers,
     background,
-    tilt,
+    tilt: tiltProps,
     intensity,
     grating,
     iridescence,
@@ -262,8 +256,13 @@ export function HologramView(props: HologramViewProps) {
     glare,
     ...rest
   } = props;
-  const scene = buildScene(props);
-  return <NativeHologramView {...rest} scene={scene} tilt={tilt} />;
+  // Both props cross as JSON: the scene schema is too dynamic for codegen to
+  // type, and the engine parses JSON anyway. See HologramViewNativeComponent.
+  const scene = JSON.stringify(buildScene(props));
+  const tilt = JSON.stringify(tiltProps ?? {});
+  return (
+    <NativeHologramView {...rest} scene={scene} tilt={tilt} />
+  );
 }
 
 export default HologramView;

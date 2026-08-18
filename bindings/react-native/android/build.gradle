@@ -1,3 +1,14 @@
+// The Android half of the React Native binding.
+//
+// Two source sets, one picked at build time. `newArchEnabled` selects between
+// src/newarch (implements the codegen-generated HologramViewManagerInterface)
+// and src/oldarch (plain @ReactProp setters). Both are thin shells over
+// src/main's HologramViewManagerImpl, which holds all the logic.
+//
+// The renderer itself comes from the published AAR
+// (io.github.alexdonh:hologramism), whose jni/<abi>/libhologramism.so is
+// packaged into the app.
+
 buildscript {
     ext.kotlin_version = "1.9.24"
     repositories {
@@ -10,8 +21,17 @@ buildscript {
     }
 }
 
+def isNewArchitectureEnabled() {
+    // The app sets this in gradle.properties; RN's own build reads the same key.
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
+if (isNewArchitectureEnabled()) {
+    // Runs codegen over package.json's codegenConfig (RNHologramismSpec).
+    apply plugin: "com.facebook.react"
+}
 
 android {
     namespace = "io.github.alexdonh.hologramism.reactnative"
@@ -19,6 +39,21 @@ android {
 
     defaultConfig {
         minSdk = 24 // hologramism native floor (wgpu Vulkan/GL).
+        buildConfigField "boolean",
+            "IS_NEW_ARCHITECTURE_ENABLED",
+            isNewArchitectureEnabled().toString()
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs += isNewArchitectureEnabled()
+                ? ["src/newarch/java"]
+                : ["src/oldarch/java"]
+        }
     }
 
     compileOptions {
@@ -43,5 +78,5 @@ repositories {
 dependencies {
     implementation "com.facebook.react:react-android"
     // The shared native HologramView (TextureView + engine).
-    implementation "io.github.alexdonh:hologramism:1.0.3"
+    implementation "io.github.alexdonh:hologramism:1.0.4"
 }

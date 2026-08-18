@@ -48,5 +48,5 @@ android {
 
 dependencies {
     // The shared native HologramView (TextureView + engine).
-    implementation "io.github.alexdonh:hologramism:1.0.3"
+    implementation "io.github.alexdonh:hologramism:1.0.4"
 }

@@ -5,7 +5,12 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 
-/** Registers the [HologramViewManager]; discovered by RN autolinking. */
+/**
+ * Registers the view manager; discovered by RN autolinking.
+ *
+ * `HologramViewManager` resolves to whichever shell the active source set
+ * provides (src/newarch or src/oldarch), so this file is architecture-agnostic.
+ */
 class HologramismPackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> =
         emptyList()

@@ -3,10 +3,30 @@ PODS:
   - hermes-engine (250829098.0.14):
     - hermes-engine/Pre-built (= 250829098.0.14)
   - hermes-engine/Pre-built (250829098.0.14)
-  - hologramism (1.0.1):
-    - HologramismKit (= 1.0.1)
+  - hologramism (1.0.3):
+    - hermes-engine
+    - HologramismKit (= 1.0.3)
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
-  - HologramismKit (1.0.1)
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - HologramismKit (1.0.3)
   - RCTDeprecation (0.86.0)
   - RCTRequired (0.86.0)
   - RCTSwiftUI (0.86.0)
@@ -2166,8 +2186,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
   hermes-engine: 59429905a519d5ce108c90aa0ef27a1483ddfa9a
-  hologramism: f435a8f509ae9dc20bc4884a893580f6bb6b98af
-  HologramismKit: a25cbfd9ed115dee70849c67bc9f1b882a3ba886
+  hologramism: bd9cef98013a6c1def925818f314329087c193dc
+  HologramismKit: 85a73316b2361d705190c5e998fd3b04ebc93a28
   RCTDeprecation: 2a74a2c57675e64419bd89078efde81f7c1de90b
   RCTRequired: 30451112e6fef4e6f31b4e7eee0845156e35e4b0
   RCTSwiftUI: 5aaf0b07e747ba749dc6acc94d8bd41eea4b570f

@@ -41,6 +41,11 @@ npm install
 npm run android   # starts Metro automatically
 ```
 
+`newArchEnabled` in [android/gradle.properties](android/gradle.properties) is the
+flag the binding's `build.gradle` reads to pick its `src/newarch` or `src/oldarch`
+view manager. React Native 0.82 and later force it on, so this demo builds the
+new-architecture half; on an older app, setting it to `false` builds the other.
+
 Use a physical device or an arm64 emulator for the GPU path; otherwise the view
 falls back to CPU read-back. Tilt (rotation-vector sensor) or drag to sweep the
 hologram; it idle-auto-orbits otherwise.

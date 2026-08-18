@@ -16,6 +16,11 @@ Pod::Spec.new do |s|
   # GPU engine, and its system frameworks all come from the `HologramismKit` pod.
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
-  s.dependency "React-Core"
   s.dependency "HologramismKit", package["version"]
+
+  if respond_to?(:install_modules_dependencies, true)
+    install_modules_dependencies(s)
+  else
+    s.dependency "React-Core"
+  end
 end
